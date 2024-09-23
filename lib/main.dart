@@ -36,9 +36,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   List<Widget> _buildPages() {
     return [
-      _buildPage('Track Your Expenses', 'assets/onboarding1.svg'),
-      _buildPage('Create Budgets', 'assets/onboarding2.svg'),
-      _buildPage('Manage Your Accounts', 'assets/onboarding3.svg'),
+      _buildPage('Track Your Expenses', 'assets/page1.jpg'),
+      _buildPage('Create Budgets', 'assets/page1.jpg'),
+      _buildPage('Manage Your Accounts', 'assets/page1.jpg'),
     ];
   }
 
