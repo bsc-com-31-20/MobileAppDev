@@ -1,0 +1,244 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Student Financial Manager',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: OnboardingScreen(),  
+      routes: {
+        '/login': (context) => LoginPage(),
+        '/home': (context) => HomePage(),
+      },
+    );
+  }
+}
+
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
+  @override
+  _OnboardingScreenState createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _pageController = PageController();
+  int _currentIndex = 0;
+
+  List<Widget> _buildPages() {
+    return [
+      _buildPage('Track Your Expenses', 'assets/page1.jpg'),
+      _buildPage('Create Budgets', 'assets/page1.jpg'),
+      _buildPage('Manage Your Accounts', 'assets/page1.jpg'),
+    ];
+  }
+
+  Widget _buildPage(String title, String assetPath) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(title, style: const TextStyle(fontSize: 24)),
+        const SizedBox(height: 20),
+        
+        Image.asset(assetPath, height: 300),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        children: _buildPages(),
+      ),
+      bottomSheet: _currentIndex == 2
+          ? TextButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+              child: const Text('Get Started'),
+            )
+          : Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              height: 60,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      _pageController.jumpToPage(2);
+                    },
+                    child: const Text('Skip'),
+                  ),
+                  Row(
+                    children: List.generate(
+                      3,
+                      (index) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentIndex == index
+                              ? Colors.blue
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: const Text('Next'),
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  bool isLogin = true;
+
+  void toggleForm() {
+    setState(() {
+      isLogin = !isLogin;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isLogin ? 'Login' : 'Sign Up'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const TextField(
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            const SizedBox(height: 10),
+            const TextField(
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/home');
+              },
+              child: Text(isLogin ? 'Login' : 'Sign Up'),
+            ),
+            TextButton(
+              onPressed: toggleForm,
+              child: Text(isLogin
+                  ? "Don't have an account? Sign Up"
+                  : "Already have an account? Login"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    AnalysisPage(),
+    const Center(child: Text('Categories Page')),
+    BudgetPage(),
+    const Center(child: Text('Accounts Page')),
+    const Center(child: Text('Profile Page')),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Financial Manager'),
+      ),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+  items: const <BottomNavigationBarItem>[
+    BottomNavigationBarItem(
+      icon: Icon(Icons.analytics),
+      label: 'Analysis',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.category),
+      label: 'Categories',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.account_balance_wallet),
+      label: 'Budgets',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.account_balance),
+      label: 'Accounts',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.person),
+      label: 'Profile',
+    ),
+  ],
+  currentIndex: _selectedIndex,
+  onTap: _onItemTapped,
+  selectedItemColor: Colors.blue, 
+  unselectedItemColor: Colors.black, 
+  type: BottomNavigationBarType.fixed, 
+),
+    );
+  }
+}
+
+class BudgetPage extends StatefulWidget {
+  @override
+  _BudgetPageState createState() => _BudgetPageState();
+}
+
+
