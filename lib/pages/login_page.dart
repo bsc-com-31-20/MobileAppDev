@@ -14,14 +14,13 @@ class _LoginPageState extends State<LoginPage> {
   String password = '';
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Toggle between login and sign-up forms
   void toggleForm() {
     setState(() {
       isLogin = !isLogin;
     });
   }
 
-  // Sign up the user
+  
   Future<void> signUp() async {
     try {
       await _auth.createUserWithEmailAndPassword(email: email, password: password);
@@ -31,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Log in the user
+  
   Future<void> login() async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);

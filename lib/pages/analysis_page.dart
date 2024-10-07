@@ -54,7 +54,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Month Selector
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -84,7 +84,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 20),
 
-              // Analysis Section
+              
               const Text(
                 'Analysis',
                 style: TextStyle(
@@ -94,7 +94,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 20),
 
-              // Monthly Records
+              
               const Text(
                 'Monthly records',
                 style: TextStyle(
@@ -104,7 +104,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 10),
 
-              // Records List
+              
               Column(
                 children: _records.map((record) {
                   return ListTile(
@@ -130,7 +130,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 20),
 
-              // Remove Ads Section
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -151,7 +151,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
     );
   }
 
-  // Legend Item Builder for Future Use
+  
   Widget _buildLegendItem(IconData icon, String label, Color color) {
     return Row(
       children: [
