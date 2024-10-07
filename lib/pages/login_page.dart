@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -9,11 +10,35 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool isLogin = true;
+  String email = '';
+  String password = '';
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // Toggle between login and sign-up forms
   void toggleForm() {
     setState(() {
       isLogin = !isLogin;
     });
+  }
+
+  // Sign up the user
+  Future<void> signUp() async {
+    try {
+      await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  // Log in the user
+  Future<void> login() async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
@@ -27,19 +52,27 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const TextField(
+            TextField(
               decoration: InputDecoration(labelText: 'Email'),
+              onChanged: (value) {
+                setState(() {
+                  email = value;
+                });
+              },
             ),
             const SizedBox(height: 10),
-            const TextField(
+            TextField(
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
+              onChanged: (value) {
+                setState(() {
+                  password = value;
+                });
+              },
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/home');
-              },
+              onPressed: isLogin ? login : signUp,
               child: Text(isLogin ? 'Login' : 'Sign Up'),
             ),
             TextButton(
