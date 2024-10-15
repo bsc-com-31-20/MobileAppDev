@@ -135,11 +135,63 @@ class AccountsPage extends StatelessWidget {
               child: Text('Ignore'),
             ),
           ],
-          icon: const Icon(Icons.more_vert), // The three dots icon
+          icon: const Icon(Icons.more_horiz), // The three dots icon
         ),
         onTap: () {
-          // Handle account tap
+          // Navigate to account details page when tapped
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AccountDetailsPage(
+                accountName: accountName,
+                balance: balance,
+              ),
+            ),
+          );
         },
+      ),
+    );
+  }
+}
+
+// New page to display account details
+class AccountDetailsPage extends StatelessWidget {
+  final String accountName;
+  final String balance;
+
+  const AccountDetailsPage({
+    required this.accountName,
+    required this.balance,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Account Details'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              accountName,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Account balance: $balance',
+              style: const TextStyle(
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
