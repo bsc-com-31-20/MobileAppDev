@@ -75,20 +75,24 @@ class _AccountsPageState extends State<AccountsPage> {
               ),
             ),
 
-            // Add Account Button
+            // Add Account Button centered
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.add),
-                label: const Text('Add Account'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  side: const BorderSide(color: Colors.black),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              child: Center(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _showAddAccountDialog(context);
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Account'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    side: const BorderSide(color: Colors.black),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
                 ),
               ),
@@ -123,16 +127,8 @@ class _AccountsPageState extends State<AccountsPage> {
             onSelected: (String value) {
               switch (value) {
                 case 'Edit':
-                  // Navigate to the Edit Account Page
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditAccountPage(
-                        accountName: account['name'],
-                        initialAmount: account['balance'],
-                      ),
-                    ),
-                  );
+                  // Show edit account dialog
+                  _showEditAccountDialog(context, index);
                   break;
                 case 'Delete':
                   // Show delete confirmation dialog
@@ -181,6 +177,42 @@ class _AccountsPageState extends State<AccountsPage> {
           },
         ),
       ),
+    );
+  }
+
+  // Method to show Add Account Dialog
+  void _showAddAccountDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AddAccountDialog(
+          onSave: (String name, String balance, IconData icon) {
+            setState(() {
+              accounts
+                  .add({'name': name, 'balance': balance, 'ignored': false});
+            });
+          },
+        );
+      },
+    );
+  }
+
+  // Method to show Edit Account Dialog
+  void _showEditAccountDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AddAccountDialog(
+          account: accounts[index],
+          onSave: (String name, String balance, IconData icon) {
+            setState(() {
+              accounts[index]['name'] = name;
+              accounts[index]['balance'] = balance;
+              // Assuming you also want to update the icon in the real UI
+            });
+          },
+        );
+      },
     );
   }
 
@@ -258,65 +290,18 @@ class _AccountsPageState extends State<AccountsPage> {
   }
 }
 
-// Page to display account details
-class AccountDetailsPage extends StatelessWidget {
-  final String accountName;
-  final String balance;
+// Dialog for adding or editing an account
+class AddAccountDialog extends StatefulWidget {
+  final Map<String, dynamic>? account;
+  final Function(String, String, IconData) onSave;
 
-  const AccountDetailsPage({
-    required this.accountName,
-    required this.balance,
-    super.key,
-  });
+  const AddAccountDialog({this.account, required this.onSave, super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Account Details'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              accountName,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Account balance: $balance',
-              style: const TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  _AddAccountDialogState createState() => _AddAccountDialogState();
 }
 
-// Page to edit account details
-class EditAccountPage extends StatefulWidget {
-  final String accountName;
-  final String initialAmount;
-
-  const EditAccountPage({
-    required this.accountName,
-    required this.initialAmount,
-    super.key,
-  });
-
-  @override
-  _EditAccountPageState createState() => _EditAccountPageState();
-}
-
-class _EditAccountPageState extends State<EditAccountPage> {
+class _AddAccountDialogState extends State<AddAccountDialog> {
   late TextEditingController _nameController;
   late TextEditingController _amountController;
   int? _selectedIconIndex;
@@ -332,8 +317,12 @@ class _EditAccountPageState extends State<EditAccountPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.accountName);
-    _amountController = TextEditingController(text: widget.initialAmount);
+    _nameController = TextEditingController(
+      text: widget.account != null ? widget.account!['name'] : '',
+    );
+    _amountController = TextEditingController(
+      text: widget.account != null ? widget.account!['balance'] : 'MK0',
+    );
     _selectedIconIndex = 0; // Default to first icon
   }
 
@@ -346,21 +335,12 @@ class _EditAccountPageState extends State<EditAccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Account'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return AlertDialog(
+      title: Text(widget.account != null ? 'Edit Account' : 'Add New Account'),
+      content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Edit Account',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-
             // Initial Amount Row
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -430,40 +410,79 @@ class _EditAccountPageState extends State<EditAccountPage> {
                 );
               }),
             ),
-            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            // Close the dialog without adding/editing the account
+            Navigator.pop(context);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
+          ),
+          child: const Text('CANCEL'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            // Save the account (either adding or editing)
+            widget.onSave(
+              _nameController.text,
+              _amountController.text,
+              _iconOptions[_selectedIconIndex!],
+            );
+            Navigator.pop(context);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
+          ),
+          child: const Text('SAVE'),
+        ),
+      ],
+    );
+  }
+}
 
-            // Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle cancel action
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30.0, vertical: 12.0),
-                  ),
-                  child: const Text('CANCEL'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle save action
-                    print('Account updated: ${_nameController.text}, '
-                        'Amount: ${_amountController.text}, '
-                        'Icon: ${_iconOptions[_selectedIconIndex!]}');
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30.0, vertical: 12.0),
-                  ),
-                  child: const Text('SAVE'),
-                ),
-              ],
+// Page to display account details
+class AccountDetailsPage extends StatelessWidget {
+  final String accountName;
+  final String balance;
+
+  const AccountDetailsPage({
+    required this.accountName,
+    required this.balance,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Account Details'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              accountName,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Account balance: $balance',
+              style: const TextStyle(
+                fontSize: 18,
+              ),
             ),
           ],
         ),
