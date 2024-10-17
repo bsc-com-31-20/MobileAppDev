@@ -27,7 +27,6 @@ class AccountsPage extends StatefulWidget {
 }
 
 class _AccountsPageState extends State<AccountsPage> {
-  // List of accounts (name, balance, ignored status)
   List<Map<String, dynamic>> accounts = [
     {'name': 'Airtel Money', 'balance': 450000, 'ignored': false},
     {'name': 'TNM Mpamba', 'balance': 0, 'ignored': false},
@@ -36,8 +35,8 @@ class _AccountsPageState extends State<AccountsPage> {
   ];
 
   double totalBalance = 0;
-  double expenseSoFar = 50000; // Placeholder for actual expense calculation
-  double incomeSoFar = 150000; // Placeholder for actual income calculation
+  double expenseSoFar = 50000;
+  double incomeSoFar = 150000;
 
   @override
   void initState() {
@@ -45,7 +44,6 @@ class _AccountsPageState extends State<AccountsPage> {
     _calculateTotalBalance();
   }
 
-  // Method to calculate total balance from all accounts
   void _calculateTotalBalance() {
     totalBalance = accounts.fold(
       0.0,
@@ -58,14 +56,14 @@ class _AccountsPageState extends State<AccountsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Removes the back arrow
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         title: Column(
           children: [
             Text(
-              '[All Accounts MK$totalBalance]', // No round brackets
+              '[All Accounts MK$totalBalance]',
               style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
@@ -82,8 +80,6 @@ class _AccountsPageState extends State<AccountsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-
-            // Accounts List
             Expanded(
               child: ListView.builder(
                 itemCount: accounts.length,
@@ -92,8 +88,6 @@ class _AccountsPageState extends State<AccountsPage> {
                 },
               ),
             ),
-
-            // Add Account Button centered
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: Center(
@@ -121,7 +115,6 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
-  // Method to build Account tile with PopupMenuButton for Edit/Delete/Ignore actions
   Widget _buildAccountTileWithActions(Map<String, dynamic> account, int index) {
     bool isIgnored = account['ignored'];
     return Opacity(
@@ -145,23 +138,19 @@ class _AccountsPageState extends State<AccountsPage> {
             onSelected: (String value) {
               switch (value) {
                 case 'Edit':
-                  // Show edit account dialog
                   _showEditAccountDialog(context, index);
                   break;
                 case 'Delete':
-                  // Show delete confirmation dialog
                   _showDeleteConfirmationDialog(
                       context, account['name'], index);
                   break;
                 case 'Ignore':
-                  // Show ignore confirmation dialog
                   _showIgnoreConfirmationDialog(context, index);
                   break;
                 case 'Restore':
-                  // Restore the ignored account
                   setState(() {
                     accounts[index]['ignored'] = false;
-                    _calculateTotalBalance(); // Recalculate total balance
+                    _calculateTotalBalance();
                   });
                   break;
               }
@@ -180,10 +169,9 @@ class _AccountsPageState extends State<AccountsPage> {
                 child: Text(isIgnored ? 'Restore' : 'Ignore'),
               ),
             ],
-            icon: const Icon(Icons.more_horiz), // The three dots icon
+            icon: const Icon(Icons.more_horiz),
           ),
           onTap: () {
-            // Navigate to account details page when tapped
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -199,7 +187,6 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
-  // Method to show Add Account Dialog
   void _showAddAccountDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -207,17 +194,12 @@ class _AccountsPageState extends State<AccountsPage> {
         return AddAccountDialog(
           onSave: (String name, String balance, IconData icon) {
             setState(() {
-              // Ensure balance is a valid number
               double parsedBalance = double.tryParse(balance) ?? 0.0;
-
-              // Add account
               accounts.add({
                 'name': name,
                 'balance': parsedBalance,
                 'ignored': false,
               });
-
-              // Recalculate total balance
               _calculateTotalBalance();
             });
           },
@@ -226,7 +208,6 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
-  // Method to show Edit Account Dialog
   void _showEditAccountDialog(BuildContext context, int index) {
     showDialog(
       context: context,
@@ -238,7 +219,7 @@ class _AccountsPageState extends State<AccountsPage> {
               double parsedBalance = double.tryParse(balance) ?? 0.0;
               accounts[index]['name'] = name;
               accounts[index]['balance'] = parsedBalance;
-              _calculateTotalBalance(); // Recalculate total balance
+              _calculateTotalBalance();
             });
           },
         );
@@ -246,7 +227,6 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
-  // Method to show Ignore confirmation dialog
   void _showIgnoreConfirmationDialog(BuildContext context, int index) {
     showDialog(
       context: context,
@@ -258,17 +238,15 @@ class _AccountsPageState extends State<AccountsPage> {
           actions: [
             TextButton(
               onPressed: () {
-                // Close the dialog without ignoring the account
                 Navigator.pop(context);
               },
               child: const Text('NO'),
             ),
             ElevatedButton(
               onPressed: () {
-                // Ignore the account and close the dialog
                 setState(() {
                   accounts[index]['ignored'] = true;
-                  _calculateTotalBalance(); // Recalculate total balance
+                  _calculateTotalBalance();
                 });
                 Navigator.pop(context);
               },
@@ -283,7 +261,6 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
-  // Method to show delete confirmation dialog
   void _showDeleteConfirmationDialog(
       BuildContext context, String accountName, int index) {
     showDialog(
@@ -296,19 +273,17 @@ class _AccountsPageState extends State<AccountsPage> {
           actions: [
             TextButton(
               onPressed: () {
-                // Close the dialog without deleting the account
                 Navigator.pop(context);
               },
               child: const Text('NO'),
             ),
             ElevatedButton(
               onPressed: () {
-                // Delete the account and close the dialog
                 setState(() {
                   accounts.removeAt(index);
-                  _calculateTotalBalance(); // Recalculate total balance
+                  _calculateTotalBalance();
                 });
-                Navigator.pop(context); // Close the dialog
+                Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -322,7 +297,6 @@ class _AccountsPageState extends State<AccountsPage> {
   }
 }
 
-// Dialog for adding or editing an account
 class AddAccountDialog extends StatefulWidget {
   final Map<String, dynamic>? account;
   final Function(String, String, IconData) onSave;
@@ -356,7 +330,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       text:
           widget.account != null ? widget.account!['balance'].toString() : '0',
     );
-    _selectedIconIndex = 0; // Default to first icon
+    _selectedIconIndex = 0;
   }
 
   @override
@@ -374,7 +348,6 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Initial Amount Row
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -396,8 +369,6 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Account Name Row
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -418,8 +389,6 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Icon options
             const Text(
               'Choose an Icon',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -449,7 +418,6 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       actions: [
         ElevatedButton(
           onPressed: () {
-            // Close the dialog without adding/editing the account
             Navigator.pop(context);
           },
           style: ElevatedButton.styleFrom(
@@ -461,7 +429,6 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            // Save the account (either adding or editing)
             widget.onSave(
               _nameController.text,
               _amountController.text,
@@ -481,7 +448,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   }
 }
 
-// Page to display account details
+// Account Details Page with Cross (X) button on the left
 class AccountDetailsPage extends StatelessWidget {
   final String accountName;
   final String balance;
@@ -496,7 +463,13 @@ class AccountDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Removes the back arrow
+        automaticallyImplyLeading: false, // Removes default back arrow
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            Navigator.pop(context); // Go back to the previous screen
+          },
+        ),
         title: const Text('Account Details'),
       ),
       body: Padding(
