@@ -13,10 +13,18 @@ class _BudgetPageState extends State<BudgetPage> {
 
   final List<Map<String, dynamic>> _budgetedItems = [
     {'icon': Icons.fastfood, 'label': 'Food', 'amount': 'MK200,000'},
-    {'icon': Icons.directions_bus, 'label': 'Transportation', 'amount': 'MK100,000'},
+    {
+      'icon': Icons.directions_bus,
+      'label': 'Transportation',
+      'amount': 'MK100,000'
+    },
     {'icon': Icons.shopping_bag, 'label': 'Clothing', 'amount': 'MK150,000'},
     {'icon': Icons.fastfood, 'label': 'Bossmnan', 'amount': 'MK20,000'},
-    {'icon': Icons.directions_bus, 'label': 'School trip', 'amount': 'MK10,000'},
+    {
+      'icon': Icons.directions_bus,
+      'label': 'School trip',
+      'amount': 'MK10,000'
+    },
     {'icon': Icons.shopping_bag, 'label': 'Dapp', 'amount': 'MK150,000'},
   ];
 
@@ -43,7 +51,8 @@ class _BudgetPageState extends State<BudgetPage> {
         elevation: 0,
         title: const Text(
           'StudentBudget',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
         ),
         centerTitle: true,
         actions: [
@@ -65,8 +74,11 @@ class _BudgetPageState extends State<BudgetPage> {
                   const Text('Selected month:', style: TextStyle(fontSize: 16)),
                   DropdownButton<String>(
                     value: _selectedMonth,
-                    items: <String>['September 2024', 'October 2024', 'November 2024']
-                        .map<DropdownMenuItem<String>>((String value) {
+                    items: <String>[
+                      'September 2024',
+                      'October 2024',
+                      'November 2024'
+                    ].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -88,52 +100,55 @@ class _BudgetPageState extends State<BudgetPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Total Budget:', style: TextStyle(fontSize: 16)),
-                      Text('MK450,000', style: TextStyle(fontSize: 18, color: Colors.green)),
+                      Text('MK450,000',
+                          style: TextStyle(fontSize: 18, color: Colors.green)),
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Total Expenditure:', style: TextStyle(fontSize: 16)),
-                      Text('MK50,000', style: TextStyle(fontSize: 18, color: Colors.red)),
+                      Text('Total Expenditure:',
+                          style: TextStyle(fontSize: 16)),
+                      Text('MK50,000',
+                          style: TextStyle(fontSize: 18, color: Colors.red)),
                     ],
                   ),
                 ],
               ),
-              const SizedBox(height: 30),
-              const Text('Budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
+              SizedBox(height: 30),
+              Text('Budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 10),
               Column(
                 children: _budgetedItems.map((item) {
                   return ListTile(
                     leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'], style: const TextStyle(fontSize: 16)),
+                    title: Text(item['label'], style: TextStyle(fontSize: 16)),
                     trailing: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(item['amount'], style: const TextStyle(fontSize: 16)),
+                      child: Text(item['amount'], style: TextStyle(fontSize: 16)),
                     ),
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 30),
-              const Text('Not budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
+              SizedBox(height: 30),
+              Text('Not budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 10),
               Column(
                 children: _notBudgetedItems.map((item) {
                   return ListTile(
                     leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'], style: const TextStyle(fontSize: 16)),
+                    title: Text(item['label'], style: TextStyle(fontSize: 16)),
                     trailing: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         side: const BorderSide(color: Colors.black),
                       ),
                       onPressed: () {},
-                      child: const Text('SET BUDGET', style: TextStyle(color: Colors.black)),
+                      child: Text('SET BUDGET', style: TextStyle(color: Colors.black)),
                     ),
                   );
                 }).toList(),
