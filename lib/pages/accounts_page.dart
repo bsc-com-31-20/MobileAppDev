@@ -73,53 +73,6 @@ class _AccountsPageState extends State<AccountsPage> {
               ),
             ),
             const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Expense so far
-                // Column(
-                //   crossAxisAlignment: CrossAxisAlignment.start,
-                //   children: [
-                //     const Text(
-                //       'EXPENSE SO FAR',
-                //       style: TextStyle(
-                //         color: Colors.red,
-                //         fontWeight: FontWeight.bold,
-                //         fontSize: 16,
-                //       ),
-                //     ),
-                //     Text(
-                //       'MK$expenseSoFar',
-                //       style: const TextStyle(
-                //         color: Colors.black,
-                //         fontSize: 16,
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // Income so far
-                // Column(
-                //   crossAxisAlignment: CrossAxisAlignment.end,
-                //   children: [
-                //     const Text(
-                //       'INCOME SO FAR',
-                //       style: TextStyle(
-                //         color: Colors.green,
-                //         fontWeight: FontWeight.bold,
-                //         fontSize: 16,
-                //       ),
-                //     ),
-                //     Text(
-                //       'MK$incomeSoFar',
-                //       style: const TextStyle(
-                //         color: Colors.black,
-                //         fontSize: 16,
-                //       ),
-                //     ),
-                //   ],
-                // ),
-              ],
-            ),
           ],
         ),
       ),
@@ -153,7 +106,7 @@ class _AccountsPageState extends State<AccountsPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
                     side: const BorderSide(color: Colors.black),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -254,12 +207,18 @@ class _AccountsPageState extends State<AccountsPage> {
         return AddAccountDialog(
           onSave: (String name, String balance, IconData icon) {
             setState(() {
+              // Ensure balance is a valid number
+              double parsedBalance = double.tryParse(balance) ?? 0.0;
+
+              // Add account
               accounts.add({
                 'name': name,
-                'balance': double.parse(balance),
-                'ignored': false
+                'balance': parsedBalance,
+                'ignored': false,
               });
-              _calculateTotalBalance(); // Recalculate total balance
+
+              // Recalculate total balance
+              _calculateTotalBalance();
             });
           },
         );
@@ -276,8 +235,9 @@ class _AccountsPageState extends State<AccountsPage> {
           account: accounts[index],
           onSave: (String name, String balance, IconData icon) {
             setState(() {
+              double parsedBalance = double.tryParse(balance) ?? 0.0;
               accounts[index]['name'] = name;
-              accounts[index]['balance'] = double.parse(balance);
+              accounts[index]['balance'] = parsedBalance;
               _calculateTotalBalance(); // Recalculate total balance
             });
           },
@@ -393,9 +353,8 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       text: widget.account != null ? widget.account!['name'] : '',
     );
     _amountController = TextEditingController(
-      text: widget.account != null
-          ? widget.account!['balance'].toString()
-          : 'MK0',
+      text:
+          widget.account != null ? widget.account!['balance'].toString() : '0',
     );
     _selectedIconIndex = 0; // Default to first icon
   }
