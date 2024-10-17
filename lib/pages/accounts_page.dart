@@ -29,26 +29,98 @@ class AccountsPage extends StatefulWidget {
 class _AccountsPageState extends State<AccountsPage> {
   // List of accounts (name, balance, ignored status)
   List<Map<String, dynamic>> accounts = [
-    {'name': 'Airtel Money', 'balance': 'MK450,000', 'ignored': false},
-    {'name': 'TNM Mpamba', 'balance': 'MK0', 'ignored': false},
-    {'name': 'National Bank', 'balance': 'MK0', 'ignored': false},
-    {'name': 'Hard Cash', 'balance': 'MK40,000', 'ignored': false},
+    {'name': 'Airtel Money', 'balance': 450000, 'ignored': false},
+    {'name': 'TNM Mpamba', 'balance': 0, 'ignored': false},
+    {'name': 'National Bank', 'balance': 0, 'ignored': false},
+    {'name': 'Hard Cash', 'balance': 40000, 'ignored': false},
   ];
+
+  double totalBalance = 0;
+  double expenseSoFar = 50000; // Placeholder for actual expense calculation
+  double incomeSoFar = 150000; // Placeholder for actual income calculation
+
+  @override
+  void initState() {
+    super.initState();
+    _calculateTotalBalance();
+  }
+
+  // Method to calculate total balance from all accounts
+  void _calculateTotalBalance() {
+    totalBalance = accounts.fold(
+      0.0,
+      (sum, account) =>
+          sum + (account['ignored'] == false ? account['balance'] : 0),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // Removes the back arrow
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'StudentBudget',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
+        title: Column(
+          children: [
+            Text(
+              '[All Accounts MK$totalBalance]', // No round brackets
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Expense so far
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     const Text(
+                //       'EXPENSE SO FAR',
+                //       style: TextStyle(
+                //         color: Colors.red,
+                //         fontWeight: FontWeight.bold,
+                //         fontSize: 16,
+                //       ),
+                //     ),
+                //     Text(
+                //       'MK$expenseSoFar',
+                //       style: const TextStyle(
+                //         color: Colors.black,
+                //         fontSize: 16,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // Income so far
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.end,
+                //   children: [
+                //     const Text(
+                //       'INCOME SO FAR',
+                //       style: TextStyle(
+                //         color: Colors.green,
+                //         fontWeight: FontWeight.bold,
+                //         fontSize: 16,
+                //       ),
+                //     ),
+                //     Text(
+                //       'MK$incomeSoFar',
+                //       style: const TextStyle(
+                //         color: Colors.black,
+                //         fontSize: 16,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+              ],
+            ),
+          ],
         ),
       ),
       body: Padding(
@@ -56,13 +128,6 @@ class _AccountsPageState extends State<AccountsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Money Accounts',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
             const SizedBox(height: 20),
 
             // Accounts List
@@ -120,7 +185,7 @@ class _AccountsPageState extends State<AccountsPage> {
             ),
           ),
           subtitle: Text(
-            'Balance: ${account['balance']}',
+            'Balance: MK${account['balance']}',
             style: const TextStyle(fontSize: 14),
           ),
           trailing: PopupMenuButton<String>(
@@ -143,6 +208,7 @@ class _AccountsPageState extends State<AccountsPage> {
                   // Restore the ignored account
                   setState(() {
                     accounts[index]['ignored'] = false;
+                    _calculateTotalBalance(); // Recalculate total balance
                   });
                   break;
               }
@@ -170,7 +236,7 @@ class _AccountsPageState extends State<AccountsPage> {
               MaterialPageRoute(
                 builder: (context) => AccountDetailsPage(
                   accountName: account['name'],
-                  balance: account['balance'],
+                  balance: account['balance'].toString(),
                 ),
               ),
             );
@@ -188,8 +254,12 @@ class _AccountsPageState extends State<AccountsPage> {
         return AddAccountDialog(
           onSave: (String name, String balance, IconData icon) {
             setState(() {
-              accounts
-                  .add({'name': name, 'balance': balance, 'ignored': false});
+              accounts.add({
+                'name': name,
+                'balance': double.parse(balance),
+                'ignored': false
+              });
+              _calculateTotalBalance(); // Recalculate total balance
             });
           },
         );
@@ -207,8 +277,8 @@ class _AccountsPageState extends State<AccountsPage> {
           onSave: (String name, String balance, IconData icon) {
             setState(() {
               accounts[index]['name'] = name;
-              accounts[index]['balance'] = balance;
-              // Assuming you also want to update the icon in the real UI
+              accounts[index]['balance'] = double.parse(balance);
+              _calculateTotalBalance(); // Recalculate total balance
             });
           },
         );
@@ -238,6 +308,7 @@ class _AccountsPageState extends State<AccountsPage> {
                 // Ignore the account and close the dialog
                 setState(() {
                   accounts[index]['ignored'] = true;
+                  _calculateTotalBalance(); // Recalculate total balance
                 });
                 Navigator.pop(context);
               },
@@ -275,6 +346,7 @@ class _AccountsPageState extends State<AccountsPage> {
                 // Delete the account and close the dialog
                 setState(() {
                   accounts.removeAt(index);
+                  _calculateTotalBalance(); // Recalculate total balance
                 });
                 Navigator.pop(context); // Close the dialog
               },
@@ -321,7 +393,9 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       text: widget.account != null ? widget.account!['name'] : '',
     );
     _amountController = TextEditingController(
-      text: widget.account != null ? widget.account!['balance'] : 'MK0',
+      text: widget.account != null
+          ? widget.account!['balance'].toString()
+          : 'MK0',
     );
     _selectedIconIndex = 0; // Default to first icon
   }
@@ -463,6 +537,7 @@ class AccountDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // Removes the back arrow
         title: const Text('Account Details'),
       ),
       body: Padding(
