@@ -179,7 +179,7 @@ class _SettingsPageState extends State<SettingsPage> {
     String lastName = _lastNameController.text;
     String email = _emailController.text;
     String phone = _phoneController.text;
-    String password = _passwordController.text;
+     //String password = _passwordController.text;
 
     // Perform validations (if necessary) and then save the new profile data
     if (firstName.isNotEmpty && lastName.isNotEmpty && email.isNotEmpty && phone.isNotEmpty) {
