@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/setting_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +18,11 @@ class ProfilePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              // Navigate to settings
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()),
+              );
+
             },
           )
         ],
@@ -54,7 +61,7 @@ class ProfilePage extends StatelessWidget {
                 color: Colors.grey[600],
               ),
             ),
-            SizedBox(height: 15),
+            SizedBox(height: 20),
 
             // Financial Summary (E.g., Total balance and income)
             Card(
@@ -69,14 +76,14 @@ class ProfilePage extends StatelessWidget {
                     Column(
                       children: [
                         Text(
-                          '\MK12,500',
+                          'MK12,500',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.green,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 8),
                         Text(
                           'Balance',
                           style: TextStyle(
@@ -90,7 +97,7 @@ class ProfilePage extends StatelessWidget {
                     Column(
                       children: [
                         Text(
-                          '\MK280,000',
+                          'MK280,000',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -149,7 +156,10 @@ class ProfilePage extends StatelessWidget {
                     title: Text('Settings'),
                     trailing: Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      // Navigate to settings
+                     Navigator.push(
+                         context,
+                        MaterialPageRoute(builder: (context) => SettingsPage()),
+                       );
                     },
                   ),
                   Divider(),

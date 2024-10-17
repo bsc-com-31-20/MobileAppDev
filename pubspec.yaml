@@ -14,6 +14,7 @@ dependencies:
   google_fonts: ^6.2.1
   font_awesome_flutter: ^10.4.0
   cached_network_image: ^3.4.1
+  image_picker: ^0.8.5+3
   
 
 dev_dependencies:
@@ -25,3 +26,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/page1.jpg
+   
