@@ -13,10 +13,18 @@ class _BudgetPageState extends State<BudgetPage> {
 
   final List<Map<String, dynamic>> _budgetedItems = [
     {'icon': Icons.fastfood, 'label': 'Food', 'amount': 'MK200,000'},
-    {'icon': Icons.directions_bus, 'label': 'Transportation', 'amount': 'MK100,000'},
+    {
+      'icon': Icons.directions_bus,
+      'label': 'Transportation',
+      'amount': 'MK100,000'
+    },
     {'icon': Icons.shopping_bag, 'label': 'Clothing', 'amount': 'MK150,000'},
     {'icon': Icons.fastfood, 'label': 'Bossmnan', 'amount': 'MK20,000'},
-    {'icon': Icons.directions_bus, 'label': 'School trip', 'amount': 'MK10,000'},
+    {
+      'icon': Icons.directions_bus,
+      'label': 'School trip',
+      'amount': 'MK10,000'
+    },
     {'icon': Icons.shopping_bag, 'label': 'Dapp', 'amount': 'MK150,000'},
   ];
 
@@ -41,14 +49,15 @@ class _BudgetPageState extends State<BudgetPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text(
+        title: const Text(
           'StudentBudget',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert, color: Colors.black),
+            icon: const Icon(Icons.more_vert, color: Colors.black),
             onPressed: () {},
           )
         ],
@@ -62,11 +71,14 @@ class _BudgetPageState extends State<BudgetPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Selected month:', style: TextStyle(fontSize: 16)),
+                  const Text('Selected month:', style: TextStyle(fontSize: 16)),
                   DropdownButton<String>(
                     value: _selectedMonth,
-                    items: <String>['September 2024', 'October 2024', 'November 2024']
-                        .map<DropdownMenuItem<String>>((String value) {
+                    items: <String>[
+                      'September 2024',
+                      'October 2024',
+                      'November 2024'
+                    ].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -80,66 +92,75 @@ class _BudgetPageState extends State<BudgetPage> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              Row(
+              const SizedBox(height: 20),
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Total Budget:', style: TextStyle(fontSize: 16)),
-                      Text('MK450,000', style: TextStyle(fontSize: 18, color: Colors.green)),
+                      Text('MK450,000',
+                          style: TextStyle(fontSize: 18, color: Colors.green)),
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Total Expenditure:', style: TextStyle(fontSize: 16)),
-                      Text('MK50,000', style: TextStyle(fontSize: 18, color: Colors.red)),
+                      Text('Total Expenditure:',
+                          style: TextStyle(fontSize: 16)),
+                      Text('MK50,000',
+                          style: TextStyle(fontSize: 18, color: Colors.red)),
                     ],
                   ),
                 ],
               ),
-              SizedBox(height: 30),
-              Text('Budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
+              const SizedBox(height: 30),
+              const Text('Budgeted items:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
               Column(
                 children: _budgetedItems.map((item) {
                   return ListTile(
                     leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'], style: TextStyle(fontSize: 16)),
+                    title: Text(item['label'],
+                        style: const TextStyle(fontSize: 16)),
                     trailing: Container(
-                      padding: EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(item['amount'], style: TextStyle(fontSize: 16)),
+                      child: Text(item['amount'],
+                          style: const TextStyle(fontSize: 16)),
                     ),
                   );
                 }).toList(),
               ),
-              SizedBox(height: 30),
-              Text('Not budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
+              const SizedBox(height: 30),
+              const Text('Not budgeted items:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
               Column(
                 children: _notBudgetedItems.map((item) {
                   return ListTile(
                     leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'], style: TextStyle(fontSize: 16)),
+                    title: Text(item['label'],
+                        style: const TextStyle(fontSize: 16)),
                     trailing: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        side: BorderSide(color: Colors.black),
+                        side: const BorderSide(color: Colors.black),
                       ),
                       onPressed: () {},
-                      child: Text('SET BUDGET', style: TextStyle(color: Colors.black)),
+                      child: const Text('SET BUDGET',
+                          style: TextStyle(color: Colors.black)),
                     ),
                   );
                 }).toList(),
               ),
-              SizedBox(height: 20),
-              Row(
+              const SizedBox(height: 20),
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.block, size: 30, color: Colors.red),
@@ -154,7 +175,7 @@ class _BudgetPageState extends State<BudgetPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.white,
-        child: Icon(Icons.add, size: 40),
+        child: const Icon(Icons.add, size: 40),
       ),
     );
   }

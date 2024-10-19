@@ -12,14 +12,12 @@ dependencies:
   supabase_flutter: ^1.6.6
   smooth_page_indicator: ^1.0.0+2
   flutter_svg: ^1.0.3
-  firebase_core: ^3.6.0
-  firebase_auth: ^5.3.1
   
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
