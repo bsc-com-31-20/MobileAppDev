@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="flutter_application_1"
         android:name="${applicationName}"
@@ -31,16 +32,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-
-    <resources>
-    <string name="default_web_client_id" translatable="false">your-web-client-id</string>
-    <string name="firebase_database_url" translatable="false">https://your-project-id.firebaseio.com</string>
-    <string name="gcm_defaultSenderId" translatable="false">your-sender-id</string>
-    <string name="google_api_key" translatable="false">your-api-key</string>
-    <string name="google_app_id" translatable="false">your-app-id</string>
-    <string name="google_crash_reporting_api_key" translatable="false">your-crash-reporting-api-key</string>
-    <string name="project_id" translatable="false">your-project-id</string>
-</resources>
 
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

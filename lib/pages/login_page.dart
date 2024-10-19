@@ -1,5 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,9 +10,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool isLogin = true;
-  String email = '';
-  String password = '';
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final SupabaseClient supabase = Supabase.instance.client;
 
   void toggleForm() {
     setState(() {
@@ -20,23 +20,33 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  
-  Future<void> signUp() async {
-    try {
-      await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-    }
-  }
+  Future<void> handleAuth() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-  
-  Future<void> login() async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (isLogin) {
+        // Login
+        final response = await supabase.auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
+        if (response.session != null) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      } else {
+        // Sign Up
+        final response = await supabase.auth.signUp(
+          email: email,
+          password: password,
+        );
+        if (response.user != null) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      }
+    } catch (error) {
+      print(error);
+      // Handle errors (e.g., show a snackbar with error message)
     }
   }
 
@@ -52,26 +62,18 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              decoration: InputDecoration(labelText: 'Email'),
-              onChanged: (value) {
-                setState(() {
-                  email = value;
-                });
-              },
+              controller: emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
             ),
             const SizedBox(height: 10),
             TextField(
-              decoration: InputDecoration(labelText: 'Password'),
+              controller: passwordController,
+              decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
-              onChanged: (value) {
-                setState(() {
-                  password = value;
-                });
-              },
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: isLogin ? login : signUp,
+              onPressed: handleAuth,
               child: Text(isLogin ? 'Login' : 'Sign Up'),
             ),
             TextButton(
