@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_application_1/pages/signup_page.dart';
 import 'pages/onboarding_screen.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
       home: const OnboardingScreen(),
       routes: {
         '/login': (context) => const LoginPage(),
+        '/signup': (context) => const SignUpPage(),  // Sign Up route
         '/home': (context) => const HomePage(),
       },
     );

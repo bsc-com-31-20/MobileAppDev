@@ -115,46 +115,40 @@ class _BudgetPageState extends State<BudgetPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 30),
-              const Text('Budgeted items:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
+              SizedBox(height: 30),
+              Text('Budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 10),
               Column(
                 children: _budgetedItems.map((item) {
                   return ListTile(
                     leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'],
-                        style: const TextStyle(fontSize: 16)),
+                    title: Text(item['label'], style: TextStyle(fontSize: 16)),
                     trailing: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(item['amount'],
-                          style: const TextStyle(fontSize: 16)),
+                      child: Text(item['amount'], style: TextStyle(fontSize: 16)),
                     ),
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 30),
-              const Text('Not budgeted items:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
+              SizedBox(height: 30),
+              Text('Not budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 10),
               Column(
                 children: _notBudgetedItems.map((item) {
                   return ListTile(
                     leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'],
-                        style: const TextStyle(fontSize: 16)),
+                    title: Text(item['label'], style: TextStyle(fontSize: 16)),
                     trailing: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         side: const BorderSide(color: Colors.black),
                       ),
                       onPressed: () {},
-                      child: const Text('SET BUDGET',
-                          style: TextStyle(color: Colors.black)),
+                      child: Text('SET BUDGET', style: TextStyle(color: Colors.black)),
                     ),
                   );
                 }).toList(),
