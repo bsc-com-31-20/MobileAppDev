@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/profile_page.dart';
 import 'budget_page.dart';
 import 'analysis_page.dart';
 import 'accounts_page.dart';
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
     const Center(child: Text('Categories Page')),
     const BudgetPage(),
     const AccountsPage(),
-    const Center(child: Text('Profile Page')),
+    ProfilePage(),  // Assuming this is non-const for a reason
   ];
 
   void _onItemTapped(int index) {

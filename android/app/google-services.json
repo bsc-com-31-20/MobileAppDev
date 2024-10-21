@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "969679159959",
+    "project_id": "studentbudget-6d0d4",
+    "storage_bucket": "studentbudget-6d0d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969679159959:android:4e068f692f2e859c275fd2",
+        "android_client_info": {
+          "package_name": "com.studentbudget.g21"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVKicE7PFx9MSo1W9mTS8BZYKA6kZOeyo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
