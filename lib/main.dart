@@ -11,7 +11,7 @@ void main() async {
  
   await Supabase.initialize(
     url: 'https://ceembasvhajkbzmdfpmn.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlZW1iYXN2aGFqa2J6bWRmcG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgzMDgxMzYsImV4cCI6MjA0Mzg4NDEzNn0.UZIwXHIIkI7ugOqUi6ulxWEs17VloKAmi3sOag74eVA', // Paste your Supabase public anon key
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlZW1iYXN2aGFqa2J6bWRmcG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgzMDgxMzYsImV4cCI6MjA0Mzg4NDEzNn0.UZIwXHIIkI7ugOqUi6ulxWEs17VloKAmi3sOag74eVA', 
   );
 
   runApp(const MyApp());

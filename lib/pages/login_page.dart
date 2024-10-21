@@ -9,6 +9,30 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final SupabaseClient supabase = Supabase.instance.client;
+
+  Future<void> handleLogin() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    try {
+      final response = await supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      if (response.session != null) {
+        // Navigate to home page if login is successful
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } catch (error) {
+      print(error);
+      // Display an error message (e.g., via snackbar)
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed: $error')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // Email TextField
               TextField(
+                 controller: emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: const TextStyle(color: Colors.deepPurple),
@@ -49,6 +74,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // Password TextField
               TextField(
+                 controller: passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   labelStyle: const TextStyle(color: Colors.deepPurple),
@@ -66,9 +92,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // Login Button
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/home');  // Navigate to home page after login
-                },
+                onPressed: handleLogin,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     vertical: 15.0,
