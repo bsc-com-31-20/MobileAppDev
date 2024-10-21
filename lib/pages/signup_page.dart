@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -10,29 +11,89 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   bool _isLoading = false;  // Track loading state
 
-  void _signUp() {
+  // Controllers for form input
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
+  // Sign up using Supabase
+  Future<void> _signUp() async {
     setState(() {
       _isLoading = true;  // Show loading indicator
     });
 
-    // Simulate a delay or network request
-    Future.delayed(const Duration(seconds: 3), () {
-      setState(() {
-        _isLoading = false;  // Hide loading indicator
-      });
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
 
-      // Show a SnackBar with account creation success message
+    // Basic validation for empty fields and password match
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty || firstName.isEmpty || lastName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Account created successfully!'),
-          backgroundColor: Colors.green,
+          content: Text('Please fill in all fields.'),
+          backgroundColor: Colors.red,
         ),
       );
-
-      // After showing SnackBar, navigate back to login page
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pushReplacementNamed(context, '/login');
+      setState(() {
+        _isLoading = false;
       });
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Passwords do not match.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      // Concatenate first name and last name for display_name
+      final displayName = '$firstName $lastName';
+
+      // Sign up with Supabase
+      final response = await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
+        data: {'display_name': displayName},  // Store display_name in user metadata
+      );
+
+      if (response.user != null) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // After a delay, navigate to the login page
+        Future.delayed(const Duration(seconds: 2), () {
+          Navigator.pushReplacementNamed(context, '/login');
+        });
+      }
+    } catch (error) {
+      // Handle error during sign-up
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
+    setState(() {
+      _isLoading = false;  // Hide loading indicator
     });
   }
 
@@ -60,6 +121,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
               // First Name TextField
               TextField(
+                controller: _firstNameController,
                 decoration: InputDecoration(
                   labelText: 'First Name',
                   labelStyle: const TextStyle(color: Colors.deepPurple),
@@ -76,6 +138,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
               // Last Name TextField
               TextField(
+                controller: _lastNameController,
                 decoration: InputDecoration(
                   labelText: 'Last Name',
                   labelStyle: const TextStyle(color: Colors.deepPurple),
@@ -92,6 +155,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
               // Email TextField
               TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: const TextStyle(color: Colors.deepPurple),
@@ -108,6 +172,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
               // Password TextField
               TextField(
+                controller: _passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   labelStyle: const TextStyle(color: Colors.deepPurple),
@@ -125,6 +190,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
               // Confirm Password TextField
               TextField(
+                controller: _confirmPasswordController,
                 decoration: InputDecoration(
                   labelText: 'Confirm Password',
                   labelStyle: const TextStyle(color: Colors.deepPurple),
