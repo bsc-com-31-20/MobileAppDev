@@ -100,7 +100,9 @@ class _AccountsPageState extends State<AccountsPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    minimumSize:
+                        const Size(180, 60), // Adjust the size as needed
                     side: const BorderSide(color: Colors.black),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
