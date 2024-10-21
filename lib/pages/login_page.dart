@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
 
-              // Email TextField
+              
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 15),
 
-              // Password TextField
+              
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Password',
@@ -64,10 +64,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
 
-              // Login Button
+              
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/home');  // Navigate to home page after login
+                  Navigator.pushReplacementNamed(context, '/home');  
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -83,10 +83,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 10),
 
-              // Don't have an account? Sign Up
+              
               TextButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/signup');  // Navigate to sign up page
+                  Navigator.pushReplacementNamed(context, '/signup');  
                 },
                 child: const Text(
                   "Don't have an account? Sign Up",

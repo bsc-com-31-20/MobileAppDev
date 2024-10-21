@@ -7,21 +7,22 @@ class SignUpPage extends StatefulWidget {
   _SignUpPageState createState() => _SignUpPageState();
 }
 
+
 class _SignUpPageState extends State<SignUpPage> {
-  bool _isLoading = false;  // Track loading state
+  bool _isLoading = false;  
 
   void _signUp() {
     setState(() {
-      _isLoading = true;  // Show loading indicator
+      _isLoading = true;  
     });
 
-    // Simulate a delay or network request
+    
     Future.delayed(const Duration(seconds: 3), () {
       setState(() {
-        _isLoading = false;  // Hide loading indicator
+        _isLoading = false;  
       });
 
-      // Show a SnackBar with account creation success message
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Account created successfully!'),
@@ -29,7 +30,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       );
 
-      // After showing SnackBar, navigate back to login page
+      
       Future.delayed(const Duration(seconds: 2), () {
         Navigator.pushReplacementNamed(context, '/login');
       });
@@ -58,7 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 20),
 
-              // First Name TextField
+              
               TextField(
                 decoration: InputDecoration(
                   labelText: 'First Name',
@@ -74,7 +75,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 15),
 
-              // Last Name TextField
+              
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Last Name',
@@ -90,7 +91,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 15),
 
-              // Email TextField
+              
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -106,7 +107,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 15),
 
-              // Password TextField
+              
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Password',
@@ -123,7 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 15),
 
-              // Confirm Password TextField
+              
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Confirm Password',
@@ -140,11 +141,11 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 20),
 
-              // Sign Up Button or Loading Indicator
+              
               _isLoading
-                  ? const CircularProgressIndicator()  // Show loading indicator while signing up
+                  ? const CircularProgressIndicator()  
                   : ElevatedButton(
-                      onPressed: _signUp,  // Call the sign-up function
+                      onPressed: _signUp,  
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                           vertical: 15.0,
@@ -162,10 +163,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
               const SizedBox(height: 10),
 
-              // Already have an account? Login
+              
               TextButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/login');  // Navigate back to login
+                  Navigator.pushReplacementNamed(context, '/login');  
                 },
                 child: const Text(
                   "Already have an account? Login",

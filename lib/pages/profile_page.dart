@@ -42,6 +42,7 @@ class ProfilePage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             
+            
             // User Name
             Text(
               'Nick kalulu',

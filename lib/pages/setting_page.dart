@@ -8,6 +8,7 @@ class SettingsPage extends StatefulWidget {
   _SettingsPageState createState() => _SettingsPageState();
 }
 
+
 class _SettingsPageState extends State<SettingsPage> {
   // Controllers for text fields
   final TextEditingController _firstNameController = TextEditingController();
@@ -49,9 +50,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Update Profile'),
+        title: Text('Update Profile', style: TextStyle(color:Colors.white)),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.deepPurple,
       ),
       body: _isSaving
           ? Center(child: CircularProgressIndicator()) // Show progress when saving
@@ -168,7 +169,7 @@ class _SettingsPageState extends State<SettingsPage> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        filled: true,
+        filled: false,
         fillColor: Colors.grey[100],
       ),
     );
