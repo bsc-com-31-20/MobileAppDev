@@ -96,7 +96,7 @@ class _AccountsPageState extends State<AccountsPage> {
                     _showAddAccountDialog(context);
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Account'),
+                  label: const Text('ADD NEW ACCOUNT'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
