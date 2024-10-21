@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/profile_page.dart';
 import 'budget_page.dart';
 import 'analysis_page.dart';
+import 'accounts_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,11 +15,11 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    AnalysisPage(),
+    const AnalysisPage(),
     const Center(child: Text('Categories Page')),
     const BudgetPage(),
-    const Center(child: Text('Accounts Page')),
-    const Center(child: Text('Profile Page')),
+    const AccountsPage(),
+    ProfilePage(),  // Assuming this is non-const for a reason
   ];
 
   void _onItemTapped(int index) {
