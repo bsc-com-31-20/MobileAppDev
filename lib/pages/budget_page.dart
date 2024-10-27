@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'add_entry_page.dart';
+
 class BudgetPage extends StatefulWidget {
   const BudgetPage({super.key});
 
@@ -173,7 +175,12 @@ class _BudgetPageState extends State<BudgetPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddEntryPage()),
+    );
+        },
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, size: 40),
       ),
