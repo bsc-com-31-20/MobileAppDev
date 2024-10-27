@@ -177,6 +177,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                   ),
+                  
                   Row(
                     children: List.generate(
                       3,
