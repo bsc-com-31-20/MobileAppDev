@@ -99,9 +99,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     'https://example.com/user-profile.jpg'),
               ),
             ),
-            SizedBox(height: 20),
-            
-            
+            const SizedBox(height: 20),
+
             // User Name
             Text(
               displayName,

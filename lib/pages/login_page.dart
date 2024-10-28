@@ -29,8 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (error) {
       print(error);
       // Display an error message (e.g., via snackbar)
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Login failed: $error')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed: $error')));
     }
   }
 
@@ -40,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Login', style: TextStyle(color:Colors.white),),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.blueAccent,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -56,9 +55,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
 
-              
+              // Email TextField
               TextField(
-                controller: emailController,
+                 controller: emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: const TextStyle(color: Colors.blueAccent),
@@ -73,9 +72,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 15),
 
-              
+              // Password TextField
               TextField(
-                controller: passwordController,
+                 controller: passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   labelStyle: const TextStyle(color: Colors.blueAccent),
@@ -91,11 +90,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
 
-              
+              // Login Button
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/home');  
-                },
+                onPressed: handleLogin,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     vertical: 15.0,
@@ -106,16 +103,14 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text('Login',
-                    style: TextStyle(fontSize: 18, color: Colors.white)),
+                child: const Text('Login', style: TextStyle(fontSize: 18,color:Colors.white)),
               ),
               const SizedBox(height: 10),
 
-              
+              // Don't have an account? Sign Up
               TextButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(
-                      context, '/signup'); // Navigate to sign up page
+                  Navigator.pushReplacementNamed(context, '/signup');  // Navigate to sign up page
                 },
                 child: const Text(
                   "Don't have an account? Sign Up",

@@ -112,12 +112,12 @@ Future<void> _fetchAccountsFromDatabase() async {
                     _showAddAccountDialog(context);
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('ADD NEW ACCOUNT'),
+                  label: const Text('Add Account'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 144, 95, 212),
+                    backgroundColor:  Colors.blueAccent,
                     foregroundColor: const Color.fromARGB(255, 255, 253, 253),
                     padding: const EdgeInsets.symmetric(horizontal: 29.0,vertical: 15.0),
-                    side: const BorderSide(color: Colors.black),
+                    side: const BorderSide(color: Colors.white),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
