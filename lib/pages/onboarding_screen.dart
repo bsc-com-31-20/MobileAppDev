@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:video_player/video_player.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -11,117 +12,123 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
+  late VideoPlayerController _videoController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the video controller
+    _videoController = VideoPlayerController.asset('assets/intro.mp4')
+      ..initialize().then((_) {
+        setState(() {
+          _videoController.setLooping(true);
+          _videoController.play();
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    _videoController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   List<Widget> _buildPages() {
     return [
       _buildPage(
         'Track Your Expenses', 
         'assets/page1.jpg', 
-        const Color(0xFF6A85B6),
         'Keep a close eye on your spending habits.',
       ),
       _buildPage(
         'Create Budgets', 
         'assets/page1.jpg', 
-        const Color(0xFF6D4C41),
         'Set your financial goals and stick to them.',
       ),
       _buildPage(
         'Manage Your Accounts', 
         'assets/page1.jpg', 
-        const Color(0xFF5C6BC0),
         'Easily track all your financial accounts in one place.',
       ),
     ];
   }
 
-  Widget _buildPage(String title, String assetPath, Color color, String phrase) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withOpacity(0.8), Colors.white],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), 
-            padding: const EdgeInsets.all(19), 
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-             
-            ),
-            child: Column(
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent,
-                    
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                
-                Text(
-                  phrase,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black54,
-                    
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                AnimatedContainer(
-                  duration: const Duration(seconds: 1),
-                  curve: Curves.easeInOut,
-                  child: Image.asset(assetPath, height: 220), 
-                ),
-              ],
-            ),
+  Widget _buildPage(String title, String assetPath, String phrase) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.white, // White text for better contrast with the video
           ),
-        ],
-      ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 20),
+        Text(
+          phrase,
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+            color: Colors.white70, // Softer white for description text
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 20),
+        Image.asset(assetPath, height: 220), // Placeholder image
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          const SizedBox(height: 60), 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              'Welcome to Finance Manager!',
-              style: GoogleFonts.poppins(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueAccent,
-              ),
-              textAlign: TextAlign.center,
-            ),
+          // Video background
+          Positioned.fill(
+            child: _videoController.value.isInitialized
+                ? AspectRatio(
+                    aspectRatio: _videoController.value.aspectRatio,
+                    child: VideoPlayer(_videoController),
+                  )
+                : Container(
+                    color: Colors.black,
+                  ),
           ),
-          const SizedBox(height: 30),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              children: _buildPages(),
-            ),
+          // Page content on top of the video
+          Column(
+            children: [
+              const SizedBox(height: 60), // Spacer for the title
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'Welcome to Finance Manager!',
+                  style: GoogleFonts.poppins(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // White text for contrast
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 30),
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                  children: _buildPages(),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -166,10 +173,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       'Skip',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.blueAccent,
+                        color: Colors.white,
                       ),
                     ),
                   ),
+                  
                   Row(
                     children: List.generate(
                       3,
@@ -181,7 +189,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: _currentIndex == index
-                              ? Colors.blueAccent
+                              ? Colors.white
                               : Colors.grey,
                         ),
                       ),
@@ -198,7 +206,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       'Next',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.blueAccent,
+                        color: Colors.white,
                       ),
                     ),
                   ),

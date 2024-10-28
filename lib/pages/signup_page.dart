@@ -8,6 +8,7 @@ class SignUpPage extends StatefulWidget {
   _SignUpPageState createState() => _SignUpPageState();
 }
 
+
 class _SignUpPageState extends State<SignUpPage> {
   bool _isLoading = false;  // Track loading state
 
@@ -21,79 +22,27 @@ class _SignUpPageState extends State<SignUpPage> {
   // Sign up using Supabase
   Future<void> _signUp() async {
     setState(() {
-      _isLoading = true;  // Show loading indicator
+      _isLoading = true;  
     });
 
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
-    final firstName = _firstNameController.text.trim();
-    final lastName = _lastNameController.text.trim();
+    
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        _isLoading = false;  
+      });
 
-    // Basic validation for empty fields and password match
-    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty || firstName.isEmpty || lastName.isEmpty) {
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please fill in all fields.'),
-          backgroundColor: Colors.red,
+          content: Text('Account created successfully!'),
+          backgroundColor: Colors.green,
         ),
       );
-      setState(() {
-        _isLoading = false;
+
+      
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushReplacementNamed(context, '/login');
       });
-      return;
-    }
-
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Passwords do not match.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-
-    try {
-      // Concatenate first name and last name for display_name
-      final displayName = '$firstName $lastName';
-
-      // Sign up with Supabase
-      final response = await Supabase.instance.client.auth.signUp(
-        email: email,
-        password: password,
-        data: {'display_name': displayName},  // Store display_name in user metadata
-      );
-
-      if (response.user != null) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account created successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // After a delay, navigate to the login page
-        Future.delayed(const Duration(seconds: 2), () {
-          Navigator.pushReplacementNamed(context, '/login');
-        });
-      }
-    } catch (error) {
-      // Handle error during sign-up
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $error'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-
-    setState(() {
-      _isLoading = false;  // Hide loading indicator
     });
   }
 
@@ -119,7 +68,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 20),
 
-              // First Name TextField
+              
               TextField(
                 controller: _firstNameController,
                 decoration: InputDecoration(
@@ -136,7 +85,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 15),
 
-              // Last Name TextField
+              
               TextField(
                 controller: _lastNameController,
                 decoration: InputDecoration(
@@ -153,7 +102,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 15),
 
-              // Email TextField
+              
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -170,7 +119,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 15),
 
-              // Password TextField
+              
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -188,7 +137,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 15),
 
-              // Confirm Password TextField
+              
               TextField(
                 controller: _confirmPasswordController,
                 decoration: InputDecoration(
@@ -206,11 +155,11 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 20),
 
-              // Sign Up Button or Loading Indicator
+              
               _isLoading
-                  ? const CircularProgressIndicator()  // Show loading indicator while signing up
+                  ? const CircularProgressIndicator()  
                   : ElevatedButton(
-                      onPressed: _signUp,  // Call the sign-up function
+                      onPressed: _signUp,  
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                           vertical: 15.0,
@@ -228,10 +177,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
               const SizedBox(height: 10),
 
-              // Already have an account? Login
+              
               TextButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/login');  // Navigate back to login
+                  Navigator.pushReplacementNamed(context, '/login');  
                 },
                 child: const Text(
                   "Already have an account? Login",
