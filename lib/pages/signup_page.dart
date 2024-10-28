@@ -103,7 +103,7 @@ class _SignUpPageState extends State<SignUpPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Sign Up', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color.fromARGB(255, 30, 41, 235),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -115,7 +115,7 @@ class _SignUpPageState extends State<SignUpPage> {
               const Icon(
                 Icons.person_add_outlined,
                 size: 100,
-                color: Colors.deepPurple,
+                color: Colors.blueAccent,
               ),
               const SizedBox(height: 20),
 
@@ -124,10 +124,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _firstNameController,
                 decoration: InputDecoration(
                   labelText: 'First Name',
-                  labelStyle: const TextStyle(color: Colors.deepPurple),
+                  labelStyle: const TextStyle(color: Colors.blueAccent),
                   filled: true,
-                  fillColor: Colors.deepPurple[50],
-                  prefixIcon: const Icon(Icons.person_outlined, color: Colors.deepPurple),
+                  fillColor: Colors.blueAccent[50],
+                  prefixIcon: const Icon(Icons.person_outlined, color: Colors.blueAccent),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -141,10 +141,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _lastNameController,
                 decoration: InputDecoration(
                   labelText: 'Last Name',
-                  labelStyle: const TextStyle(color: Colors.deepPurple),
+                  labelStyle: const TextStyle(color: Colors.blueAccent),
                   filled: true,
-                  fillColor: Colors.deepPurple[50],
-                  prefixIcon: const Icon(Icons.person_outlined, color: Colors.deepPurple),
+                  fillColor: Colors.blueAccent[50],
+                  prefixIcon: const Icon(Icons.person_outlined, color: Colors.blueAccent),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -158,10 +158,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: const TextStyle(color: Colors.deepPurple),
+                  labelStyle: const TextStyle(color: Colors.blueAccent),
                   filled: true,
-                  fillColor: Colors.deepPurple[50],
-                  prefixIcon: const Icon(Icons.email, color: Colors.deepPurple),
+                  fillColor: Colors.blueAccent[50],
+                  prefixIcon: const Icon(Icons.email, color: Colors.blueAccent),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -175,10 +175,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  labelStyle: const TextStyle(color: Colors.deepPurple),
+                  labelStyle: const TextStyle(color: Colors.blueAccent),
                   filled: true,
-                  fillColor: Colors.deepPurple[50],
-                  prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
+                  fillColor: Colors.blueAccent[50],
+                  prefixIcon: const Icon(Icons.lock, color: Colors.blueAccent),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -193,10 +193,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _confirmPasswordController,
                 decoration: InputDecoration(
                   labelText: 'Confirm Password',
-                  labelStyle: const TextStyle(color: Colors.deepPurple),
+                  labelStyle: const TextStyle(color: Colors.blueAccent),
                   filled: true,
                   fillColor: Colors.deepPurple[50],
-                  prefixIcon: const Icon(Icons.lock_outline, color: Colors.deepPurple),
+                  prefixIcon: const Icon(Icons.lock_outline, color: Colors.blueAccent),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -216,7 +216,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           vertical: 15.0,
                           horizontal: 100.0,
                         ),
-                        backgroundColor: Colors.deepPurple,
+                        backgroundColor: Colors.blueAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -235,7 +235,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 },
                 child: const Text(
                   "Already have an account? Login",
-                  style: TextStyle(color: Colors.deepPurple),
+                  style: TextStyle(color: Colors.blueAccent),
                 ),
               ),
             ],
