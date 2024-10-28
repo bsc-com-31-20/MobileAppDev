@@ -72,7 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
           style: TextStyle(fontSize: 18, color: Colors.white),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.deepPurple,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -152,14 +152,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                     // Income (Static value or replace with dynamic if needed)
-                    const Column(
-                      children: [
+                    Column(
+                      children: const [
                         Text(
                           'MK280,000',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
+                            color: Colors.blue,
                           ),
                         ),
                         SizedBox(height: 5),
