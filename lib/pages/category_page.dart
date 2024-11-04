@@ -42,13 +42,12 @@ class _CategoryPageState extends State<CategoryPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          // Wrap Column in SingleChildScrollView
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildCategorySection('Income Categories', incomeCategories),
               _buildCategorySection('Expense Categories', expenseCategories),
-              const SizedBox(height: 16), // Add some spacing
+              const SizedBox(height: 16),
               Center(
                 child: ElevatedButton.icon(
                   onPressed: () {
@@ -150,15 +149,6 @@ class _CategoryPageState extends State<CategoryPage> {
             ],
             icon: const Icon(Icons.more_horiz),
           ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    CategoryDetailsPage(categoryName: category['name']),
-              ),
-            );
-          },
         ),
       ),
     );
@@ -169,10 +159,15 @@ class _CategoryPageState extends State<CategoryPage> {
       context: context,
       builder: (BuildContext context) {
         return AddCategoryDialog(
-          onSave: (String name, IconData icon) {
+          onSave: (String name, IconData icon, bool isIncomeCategory) {
             setState(() {
-              incomeCategories
-                  .add({'icon': icon, 'name': name, 'ignored': false});
+              if (isIncomeCategory) {
+                incomeCategories
+                    .add({'icon': icon, 'name': name, 'ignored': false});
+              } else {
+                expenseCategories
+                    .add({'icon': icon, 'name': name, 'ignored': false});
+              }
             });
           },
         );
@@ -187,10 +182,11 @@ class _CategoryPageState extends State<CategoryPage> {
       builder: (BuildContext context) {
         return AddCategoryDialog(
           initialCategory: category,
-          onSave: (String name, IconData icon) {
+          onSave: (String name, IconData icon, bool isIncomeCategory) {
             setState(() {
               category['name'] = name;
               category['icon'] = icon;
+              category['isIncome'] = isIncomeCategory;
             });
           },
         );
@@ -233,51 +229,9 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 }
 
-class CategoryDetailsPage extends StatelessWidget {
-  final String categoryName;
-
-  const CategoryDetailsPage({required this.categoryName, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text('Category Details'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              categoryName,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'This section contains more details about the selected category.',
-              style: TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class AddCategoryDialog extends StatefulWidget {
   final Map<String, dynamic>? initialCategory;
-  final Function(String, IconData) onSave;
+  final Function(String, IconData, bool) onSave;
 
   const AddCategoryDialog(
       {this.initialCategory, required this.onSave, super.key});
@@ -289,6 +243,7 @@ class AddCategoryDialog extends StatefulWidget {
 class _AddCategoryDialogState extends State<AddCategoryDialog> {
   late TextEditingController _nameController;
   int _selectedIconIndex = 0;
+  bool isIncomeCategory = true;
 
   final List<IconData> _iconOptions = [
     Icons.card_giftcard,
@@ -327,6 +282,54 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       content: SingleChildScrollView(
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Type:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isIncomeCategory = true;
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        isIncomeCategory
+                            ? Icons.check_circle
+                            : Icons.circle_outlined,
+                        color: isIncomeCategory ? Colors.blue : Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      const Text('INCOME', style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isIncomeCategory = false;
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        !isIncomeCategory
+                            ? Icons.check_circle
+                            : Icons.circle_outlined,
+                        color: !isIncomeCategory ? Colors.blue : Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      const Text('EXPENSE', style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
@@ -335,10 +338,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Choose an Icon',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            const Text('Choose an Icon',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Wrap(
               spacing: 10,
@@ -373,6 +374,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
             widget.onSave(
               _nameController.text,
               _iconOptions[_selectedIconIndex],
+              isIncomeCategory,
             );
             Navigator.pop(context);
           },
