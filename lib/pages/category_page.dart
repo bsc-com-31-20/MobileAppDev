@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'category_model.dart'; // Import the shared CategoryModel
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -8,22 +10,10 @@ class CategoryPage extends StatefulWidget {
 }
 
 class _CategoryPageState extends State<CategoryPage> {
-  List<Map<String, dynamic>> incomeCategories = [
-    {'icon': Icons.card_giftcard, 'name': 'Awards', 'ignored': false},
-    {'icon': Icons.local_offer, 'name': 'Coupons', 'ignored': false},
-    {'icon': Icons.grading, 'name': 'Grants', 'ignored': false},
-    {'icon': Icons.confirmation_number, 'name': 'Lottery', 'ignored': false},
-  ];
-
-  List<Map<String, dynamic>> expenseCategories = [
-    {'icon': Icons.school, 'name': 'Education', 'ignored': false},
-    {'icon': Icons.devices, 'name': 'Electronics', 'ignored': false},
-    {'icon': Icons.movie, 'name': 'Entertainment', 'ignored': false},
-    {'icon': Icons.fastfood, 'name': 'Food', 'ignored': false},
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final categoryModel = Provider.of<CategoryModel>(context);
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -45,13 +35,19 @@ class _CategoryPageState extends State<CategoryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildCategorySection('Income Categories', incomeCategories),
-              _buildCategorySection('Expense Categories', expenseCategories),
+              _buildCategorySection(
+                'Income Categories',
+                categoryModel.incomeCategories,
+              ),
+              _buildCategorySection(
+                'Expense Categories',
+                categoryModel.expenseCategories,
+              ),
               const SizedBox(height: 16),
               Center(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    _showAddCategoryDialog(context);
+                    _showAddCategoryDialog(context, categoryModel);
                   },
                   icon: const Icon(Icons.add),
                   label: const Text('ADD NEW CATEGORY'),
@@ -75,7 +71,9 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildCategorySection(
-      String title, List<Map<String, dynamic>> categories) {
+    String title,
+    List<Map<String, dynamic>> categories,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -154,21 +152,14 @@ class _CategoryPageState extends State<CategoryPage> {
     );
   }
 
-  void _showAddCategoryDialog(BuildContext context) {
+  void _showAddCategoryDialog(
+      BuildContext context, CategoryModel categoryModel) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AddCategoryDialog(
           onSave: (String name, IconData icon, bool isIncomeCategory) {
-            setState(() {
-              if (isIncomeCategory) {
-                incomeCategories
-                    .add({'icon': icon, 'name': name, 'ignored': false});
-              } else {
-                expenseCategories
-                    .add({'icon': icon, 'name': name, 'ignored': false});
-              }
-            });
+            categoryModel.addCategory(name, icon, isIncomeCategory);
           },
         );
       },
@@ -211,12 +202,8 @@ class _CategoryPageState extends State<CategoryPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                setState(() {
-                  incomeCategories.removeWhere(
-                      (category) => category['name'] == categoryName);
-                  expenseCategories.removeWhere(
-                      (category) => category['name'] == categoryName);
-                });
+                Provider.of<CategoryModel>(context, listen: false)
+                    .removeCategory(categoryName);
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -233,8 +220,11 @@ class AddCategoryDialog extends StatefulWidget {
   final Map<String, dynamic>? initialCategory;
   final Function(String, IconData, bool) onSave;
 
-  const AddCategoryDialog(
-      {this.initialCategory, required this.onSave, super.key});
+  const AddCategoryDialog({
+    this.initialCategory,
+    required this.onSave,
+    super.key,
+  });
 
   @override
   _AddCategoryDialogState createState() => _AddCategoryDialogState();
@@ -282,19 +272,15 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       content: SingleChildScrollView(
         child: Column(
           children: [
+            // Category Type Selection
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Type:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
+                const Text('Type:',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isIncomeCategory = true;
-                    });
-                  },
+                  onTap: () => setState(() => isIncomeCategory = true),
                   child: Row(
                     children: [
                       Icon(
@@ -309,11 +295,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isIncomeCategory = false;
-                    });
-                  },
+                  onTap: () => setState(() => isIncomeCategory = false),
                   child: Row(
                     children: [
                       Icon(
@@ -330,6 +312,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               ],
             ),
             const SizedBox(height: 20),
+
+            // Category Name Input
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
@@ -338,6 +322,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // Icon Selection
             const Text('Choose an Icon',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
@@ -345,11 +331,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               spacing: 10,
               children: List.generate(_iconOptions.length, (index) {
                 return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedIconIndex = index;
-                    });
-                  },
+                  onTap: () => setState(() => _selectedIconIndex = index),
                   child: Icon(
                     _iconOptions[index],
                     size: 40,
@@ -364,9 +346,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
           child: const Text('CANCEL'),
         ),
         ElevatedButton(

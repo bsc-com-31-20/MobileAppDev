@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'add_entry_page.dart';
+import 'package:provider/provider.dart';
+import 'category_model.dart'; // Import the shared CategoryModel
 
 class BudgetPage extends StatefulWidget {
   const BudgetPage({super.key});
@@ -13,6 +13,7 @@ class _BudgetPageState extends State<BudgetPage> {
   int _selectedIndex = 2;
   String _selectedMonth = 'September 2024';
 
+  // Predefined budgeted items
   final List<Map<String, dynamic>> _budgetedItems = [
     {'icon': Icons.fastfood, 'label': 'Food', 'amount': 'MK200,000'},
     {
@@ -21,22 +22,6 @@ class _BudgetPageState extends State<BudgetPage> {
       'amount': 'MK100,000'
     },
     {'icon': Icons.shopping_bag, 'label': 'Clothing', 'amount': 'MK150,000'},
-    {'icon': Icons.fastfood, 'label': 'Bossmnan', 'amount': 'MK20,000'},
-    {
-      'icon': Icons.directions_bus,
-      'label': 'School trip',
-      'amount': 'MK10,000'
-    },
-    {'icon': Icons.shopping_bag, 'label': 'Dapp', 'amount': 'MK150,000'},
-  ];
-
-  final List<Map<String, dynamic>> _notBudgetedItems = [
-    {'icon': Icons.computer, 'label': 'Electronics'},
-    {'icon': Icons.favorite, 'label': 'Healthy'},
-    {'icon': Icons.phone_android, 'label': 'Bundles'},
-    {'icon': Icons.computer, 'label': 'Tech'},
-    {'icon': Icons.favorite, 'label': 'Panado'},
-    {'icon': Icons.phone_android, 'label': 'Voice bundles'},
   ];
 
   void _onItemTapped(int index) {
@@ -47,6 +32,15 @@ class _BudgetPageState extends State<BudgetPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Access the shared CategoryModel instance
+    final categoryModel = Provider.of<CategoryModel>(context);
+
+    // Get all expense categories that have not yet been budgeted
+    final notBudgetedItems = categoryModel.expenseCategories
+        .where((category) =>
+            !_budgetedItems.any((item) => item['label'] == category['name']))
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -54,7 +48,10 @@ class _BudgetPageState extends State<BudgetPage> {
         title: const Text(
           'StudentBudget',
           style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
         ),
         centerTitle: true,
         actions: [
@@ -70,6 +67,7 @@ class _BudgetPageState extends State<BudgetPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Dropdown for selecting month
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -95,6 +93,8 @@ class _BudgetPageState extends State<BudgetPage> {
                 ],
               ),
               const SizedBox(height: 20),
+
+              // Total budget and expenditure display
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -102,8 +102,10 @@ class _BudgetPageState extends State<BudgetPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Total Budget:', style: TextStyle(fontSize: 16)),
-                      Text('MK450,000',
-                          style: TextStyle(fontSize: 18, color: Colors.green)),
+                      Text(
+                        'MK450,000',
+                        style: TextStyle(fontSize: 18, color: Colors.green),
+                      ),
                     ],
                   ),
                   Column(
@@ -111,57 +113,79 @@ class _BudgetPageState extends State<BudgetPage> {
                     children: [
                       Text('Total Expenditure:',
                           style: TextStyle(fontSize: 16)),
-                      Text('MK50,000',
-                          style: TextStyle(fontSize: 18, color: Colors.red)),
+                      Text(
+                        'MK50,000',
+                        style: TextStyle(fontSize: 18, color: Colors.red),
+                      ),
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: 30),
-              const Text('Budgeted items:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+              // Display budgeted items
+              const Text(
+                'Budgeted items:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10),
               Column(
                 children: _budgetedItems.map((item) {
                   return ListTile(
                     leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'],
-                        style: const TextStyle(fontSize: 16)),
+                    title: Text(
+                      item['label'],
+                      style: const TextStyle(fontSize: 16),
+                    ),
                     trailing: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(item['amount'],
-                          style: const TextStyle(fontSize: 16)),
+                      child: Text(
+                        item['amount'],
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
                   );
                 }).toList(),
               ),
               const SizedBox(height: 30),
-              const Text('Not budgeted items:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+              // Display not budgeted items from expense categories
+              const Text(
+                'Not budgeted items:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10),
               Column(
-                children: _notBudgetedItems.map((item) {
+                children: notBudgetedItems.map((item) {
                   return ListTile(
                     leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'],
-                        style: const TextStyle(fontSize: 16)),
+                    title: Text(
+                      item['name'],
+                      style: const TextStyle(fontSize: 16),
+                    ),
                     trailing: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         side: const BorderSide(color: Colors.black),
                       ),
-                      onPressed: () {},
-                      child: const Text('SET BUDGET',
-                          style: TextStyle(color: Colors.black)),
+                      onPressed: () {
+                        // Implement budget-setting logic here
+                      },
+                      child: const Text(
+                        'SET BUDGET',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   );
                 }).toList(),
               ),
               const SizedBox(height: 20),
+
+              // Remove Ads section
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -176,10 +200,7 @@ class _BudgetPageState extends State<BudgetPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddEntryPage()),
-    );
+          // Navigate to add entry page or handle action
         },
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, size: 40),
