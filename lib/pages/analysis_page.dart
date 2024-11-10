@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // For date formatting
 import 'add_entry_page.dart';
 
 class AnalysisPage extends StatefulWidget {
@@ -9,7 +10,7 @@ class AnalysisPage extends StatefulWidget {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
-  String _selectedMonth = 'September 2024';
+  DateTime? _selectedDate;
 
   final List<Map<String, dynamic>> _records = [
     {
@@ -35,6 +36,15 @@ class _AnalysisPageState extends State<AnalysisPage> {
     },
   ];
 
+  // Format the selected date
+  String get formattedDate {
+    if (_selectedDate == null) {
+      return 'Select Date';
+    } else {
+      return DateFormat('d MMMM yyyy').format(_selectedDate!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,37 +67,40 @@ class _AnalysisPageState extends State<AnalysisPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Selected month:',
+                    'Selected date:',
                     style: TextStyle(fontSize: 16),
                   ),
-                  DropdownButton<String>(
-                    value: _selectedMonth,
-                    items: const <String>[
-                      'September 2024',
-                      'October 2024',
-                      'November 2024'
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
+                  TextButton(
+                    onPressed: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedDate ?? DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
                       );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedMonth = newValue!;
-                      });
+                      if (pickedDate != null) {
+                        setState(() {
+                          _selectedDate = pickedDate;
+                        });
+                      }
                     },
+                    child: Text(
+                      formattedDate,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
 
-              
               const Text(
                 'Analysis',
                 style: TextStyle(
@@ -97,7 +110,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 20),
 
-              
               const Text(
                 'Monthly records',
                 style: TextStyle(
@@ -107,7 +119,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 10),
 
-              
               Column(
                 children: _records.map((record) {
                   return ListTile(
@@ -133,7 +144,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 20),
 
-              // Remove Ads Section
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -149,9 +159,9 @@ class _AnalysisPageState extends State<AnalysisPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddEntryPage()),
-    );
+            context,
+            MaterialPageRoute(builder: (context) => AddEntryPage()),
+          );
         },
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, size: 40),
@@ -159,7 +169,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
     );
   }
 
-  
   Widget _buildLegendItem(IconData icon, String label, Color color) {
     return Row(
       children: [
