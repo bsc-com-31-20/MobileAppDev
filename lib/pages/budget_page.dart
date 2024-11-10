@@ -176,7 +176,7 @@ class _BudgetPageState extends State<BudgetPage> {
               '${_selectedMonth.split(" ")[0]}, ${_selectedMonth.split(" ")[1]}',
               style: const TextStyle(
                 color: Colors.black,
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -185,11 +185,11 @@ class _BudgetPageState extends State<BudgetPage> {
               children: [
                 Text(
                   'TOTAL BUDGET',
-                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  style: TextStyle(color: Colors.black, fontSize: 14),
                 ),
                 Text(
                   'TOTAL SPENT',
-                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  style: TextStyle(color: Colors.black, fontSize: 14),
                 ),
               ],
             ),
@@ -198,11 +198,11 @@ class _BudgetPageState extends State<BudgetPage> {
               children: [
                 Text(
                   'MK${_totalBudget.toStringAsFixed(2)}',
-                  style: const TextStyle(color: Colors.black, fontSize: 14),
+                  style: const TextStyle(color: Colors.black, fontSize: 12),
                 ),
                 Text(
                   'MK${_totalSpent.toStringAsFixed(2)}',
-                  style: const TextStyle(color: Colors.black, fontSize: 14),
+                  style: const TextStyle(color: Colors.black, fontSize: 12),
                 ),
               ],
             ),
