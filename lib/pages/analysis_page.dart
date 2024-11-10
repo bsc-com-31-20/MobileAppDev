@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'add_entry_page.dart';
 
 class AnalysisPage extends StatefulWidget {
+  const AnalysisPage({super.key});
+
   @override
   _AnalysisPageState createState() => _AnalysisPageState();
 }
@@ -130,10 +133,10 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 20),
 
-              
-              Row(
+              // Remove Ads Section
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(Icons.block, size: 30, color: Colors.red),
                   SizedBox(width: 10),
                   Text('Remove Ads - MK3,500', style: TextStyle(fontSize: 16)),
@@ -144,7 +147,12 @@ class _AnalysisPageState extends State<AnalysisPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddEntryPage()),
+    );
+        },
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, size: 40),
       ),
