@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For date formatting
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import 'add_entry_page.dart';
 
 class AnalysisPage extends StatefulWidget {
@@ -17,26 +18,25 @@ class _AnalysisPageState extends State<AnalysisPage> {
       'icon': Icons.fastfood,
       'label': 'Food - Airtel Money',
       'date': '13th September 2024',
-      'amount': '-MK2,000',
+      'amount': -200000.0,
       'color': Colors.red
     },
     {
       'icon': Icons.account_balance,
       'label': 'Upkeep - National Bank',
       'date': '12th September 2024',
-      'amount': 'MK280,000',
+      'amount': 280000.0,
       'color': Colors.green
     },
     {
       'icon': Icons.fastfood,
       'label': 'Food - Airtel Money',
       'date': '8th September 2024',
-      'amount': '-MK6,500',
+      'amount': -6500.0,
       'color': Colors.red
     },
   ];
 
-  // Format the selected date
   String get formattedDate {
     if (_selectedDate == null) {
       return 'Select Date';
@@ -44,6 +44,14 @@ class _AnalysisPageState extends State<AnalysisPage> {
       return DateFormat('d MMMM yyyy').format(_selectedDate!);
     }
   }
+
+  double get totalIncome => _records
+      .where((record) => record['amount'] > 0)
+      .fold(0.0, (sum, record) => sum + record['amount']);
+
+  double get totalExpense => _records
+      .where((record) => record['amount'] < 0)
+      .fold(0.0, (sum, record) => sum + record['amount'].abs());
 
   @override
   Widget build(BuildContext context) {
@@ -100,12 +108,37 @@ class _AnalysisPageState extends State<AnalysisPage> {
                 ],
               ),
               const SizedBox(height: 20),
-
               const Text(
                 'Analysis',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Pie Chart
+              SizedBox(
+                height: 200,
+                child: PieChart(
+                  PieChartData(
+                    sections: [
+                      PieChartSectionData(
+                        color: Colors.red,
+                        value: totalExpense,
+                        title: 'Expenses',
+                        titleStyle: const TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      PieChartSectionData(
+                        color: Colors.green,
+                        value: totalIncome,
+                        title: 'Income',
+                        titleStyle: const TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ],
+                    sectionsSpace: 4,
+                    centerSpaceRadius: 40,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -132,7 +165,9 @@ class _AnalysisPageState extends State<AnalysisPage> {
                       style: const TextStyle(fontSize: 14),
                     ),
                     trailing: Text(
-                      record['amount'],
+                      record['amount'] < 0
+                          ? '-MK${record['amount'].abs()}'
+                          : 'MK${record['amount']}',
                       style: TextStyle(
                         fontSize: 16,
                         color: record['color'],
@@ -166,16 +201,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, size: 40),
       ),
-    );
-  }
-
-  Widget _buildLegendItem(IconData icon, String label, Color color) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 20),
-        const SizedBox(width: 8),
-        Text(label, style: const TextStyle(fontSize: 16)),
-      ],
     );
   }
 }
