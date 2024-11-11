@@ -152,8 +152,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                     // Income (Static value or replace with dynamic if needed)
-                    Column(
-                      children: const [
+                    const Column(
+                      children: [
                         Text(
                           'MK280,000',
                           style: TextStyle(

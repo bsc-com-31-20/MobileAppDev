@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'add_entry_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class BudgetPage extends StatefulWidget {
   const BudgetPage({super.key});
@@ -10,59 +9,110 @@ class BudgetPage extends StatefulWidget {
 }
 
 class _BudgetPageState extends State<BudgetPage> {
-  int _selectedIndex = 2;
   String _selectedMonth = 'September 2024';
+  List<Map<String, dynamic>> _budgetedItems = [];
 
-  final List<Map<String, dynamic>> _budgetedItems = [
-    {'icon': Icons.fastfood, 'label': 'Food', 'amount': 'MK200,000'},
-    {
-      'icon': Icons.directions_bus,
-      'label': 'Transportation',
-      'amount': 'MK100,000'
-    },
-    {'icon': Icons.shopping_bag, 'label': 'Clothing', 'amount': 'MK150,000'},
-    {'icon': Icons.fastfood, 'label': 'Bossmnan', 'amount': 'MK20,000'},
-    {
-      'icon': Icons.directions_bus,
-      'label': 'School trip',
-      'amount': 'MK10,000'
-    },
-    {'icon': Icons.shopping_bag, 'label': 'Dapp', 'amount': 'MK150,000'},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchBudgets();  // Fetch budgeted items on page load
+  }
 
-  final List<Map<String, dynamic>> _notBudgetedItems = [
-    {'icon': Icons.computer, 'label': 'Electronics'},
-    {'icon': Icons.favorite, 'label': 'Healthy'},
-    {'icon': Icons.phone_android, 'label': 'Bundles'},
-    {'icon': Icons.computer, 'label': 'Tech'},
-    {'icon': Icons.favorite, 'label': 'Panado'},
-    {'icon': Icons.phone_android, 'label': 'Voice bundles'},
-  ];
+  // Fetch budgeted items from Supabase
+  Future<void> _fetchBudgets() async {
+    final user = Supabase.instance.client.auth.currentUser;
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (user != null) {
+      final response = await Supabase.instance.client
+          .from('categories')
+          .select('category_name, budget')
+          .eq('user_id', user.id)
+          .execute();
+
+      if (response.status == 200 && response.data != null) {
+        setState(() {
+          _budgetedItems = List<Map<String, dynamic>>.from(response.data);
+        });
+      } else {
+        print('Error fetching budgets: ${response.status}');
+      }
+    }
+  }
+
+  // Show add budget dialog
+  void _showAddBudgetDialog(BuildContext context) {
+    final TextEditingController _categoryNameController = TextEditingController();
+    final TextEditingController _amountController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Add Budget"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _categoryNameController,
+                decoration: const InputDecoration(labelText: "Category Name"),
+              ),
+              TextField(
+                controller: _amountController,
+                decoration: const InputDecoration(labelText: "Set Amount"),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                String categoryName = _categoryNameController.text.trim();
+                double? budgetAmount = double.tryParse(_amountController.text.trim());
+
+                if (categoryName.isNotEmpty && budgetAmount != null) {
+                  // Save to database
+                  _addBudgetToDatabase(categoryName, budgetAmount);
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text("Add"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Add budget to Supabase database
+  Future<void> _addBudgetToDatabase(String categoryName, double budgetAmount) async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user != null) {
+      final response = await Supabase.instance.client
+          .from('categories')
+          .insert({
+            'category_name': categoryName,
+            'budget': budgetAmount,
+          })
+          .execute();
+
+      if (response.status == 201) {
+        _fetchBudgets(); // Refresh the budgeted items list after adding a new entry
+      } else {
+        print('Error adding budget: ${response.status}');
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'StudentBudget',
-          style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
-          )
-        ],
+        title: const Text('Budget Page'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -95,88 +145,50 @@ class _BudgetPageState extends State<BudgetPage> {
                 ],
               ),
               const SizedBox(height: 20),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Total Budget:', style: TextStyle(fontSize: 16)),
-                      Text('MK450,000',
-                          style: TextStyle(fontSize: 18, color: Colors.green)),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Total Expenditure:',
-                          style: TextStyle(fontSize: 16)),
-                      Text('MK50,000',
-                          style: TextStyle(fontSize: 18, color: Colors.red)),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              Text('Budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
+              const Text('Budgeted items:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
               Column(
                 children: _budgetedItems.map((item) {
                   return ListTile(
-                    leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'], style: TextStyle(fontSize: 16)),
+                    leading: const Icon(Icons.category, size: 40),
+                    title: Text(item['category_name'] ?? '',
+                        style: const TextStyle(fontSize: 16)),
                     trailing: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(item['amount'], style: TextStyle(fontSize: 16)),
-                    ),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 30),
-              Text('Not budgeted items:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              Column(
-                children: _notBudgetedItems.map((item) {
-                  return ListTile(
-                    leading: Icon(item['icon'], size: 40),
-                    title: Text(item['label'], style: TextStyle(fontSize: 16)),
-                    trailing: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.black),
-                      ),
-                      onPressed: () {},
-                      child: Text('SET BUDGET', style: TextStyle(color: Colors.black)),
+                      child: Text('MK${item['budget']}',
+                          style: const TextStyle(fontSize: 16)),
                     ),
                   );
                 }).toList(),
               ),
               const SizedBox(height: 20),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.block, size: 30, color: Colors.red),
-                  SizedBox(width: 10),
-                  Text('Remove Ads - MK3,500', style: TextStyle(fontSize: 16)),
-                ],
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _showAddBudgetDialog(context);
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('ADD NEW BUDGET'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    minimumSize: const Size(180, 60), // Adjust the size as needed
+                    side: const BorderSide(color: Colors.black),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddEntryPage()),
-    );
-        },
-        backgroundColor: Colors.white,
-        child: const Icon(Icons.add, size: 40),
       ),
     );
   }

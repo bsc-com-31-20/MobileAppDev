@@ -111,7 +111,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
 
             // Text input for amount
             TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Amount',
               ),

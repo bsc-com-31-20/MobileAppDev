@@ -150,7 +150,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
         onPressed: () {
           Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddEntryPage()),
+      MaterialPageRoute(builder: (context) => const AddEntryPage()),
     );
         },
         backgroundColor: Colors.white,

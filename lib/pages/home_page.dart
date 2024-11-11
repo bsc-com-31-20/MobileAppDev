@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
     const Center(child: Text('Categories Page')),
     const BudgetPage(),
     const AccountsPage(),
-    ProfilePage(),  // Assuming this is non-const for a reason
+    const ProfilePage(),  // Assuming this is non-const for a reason
   ];
 
   void _onItemTapped(int index) {
