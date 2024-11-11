@@ -115,7 +115,14 @@ class _BudgetPageState extends State<BudgetPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Budget Page'),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
+        title: const Text('Budget', 
+             style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 24
+              ),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

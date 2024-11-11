@@ -72,7 +72,7 @@ class _AccountsPageState extends State<AccountsPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blueAccent,
         elevation: 0,
         centerTitle: true,
         title: Column(
@@ -80,7 +80,7 @@ class _AccountsPageState extends State<AccountsPage> {
             Text(
               '[All Accounts MK$totalBalance]',
               style: const TextStyle(
-                color: Colors.black,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
@@ -113,10 +113,10 @@ class _AccountsPageState extends State<AccountsPage> {
                   icon: const Icon(Icons.add),
                   label: const Text('Add Account'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 144, 95, 212),
+                    backgroundColor: Colors.blueAccent,
                     foregroundColor: const Color.fromARGB(255, 255, 253, 253),
                     padding: const EdgeInsets.symmetric(horizontal: 29.0,vertical: 15.0),
-                    side: const BorderSide(color: Colors.black),
+                    side: const BorderSide(color: Colors.white),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
