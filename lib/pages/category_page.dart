@@ -90,7 +90,7 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
         ...categories.map((category) {
           return _buildCategoryTileWithActions(category);
-        }).toList(),
+        }),
       ],
     );
   }

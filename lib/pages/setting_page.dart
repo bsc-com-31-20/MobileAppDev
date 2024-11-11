@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

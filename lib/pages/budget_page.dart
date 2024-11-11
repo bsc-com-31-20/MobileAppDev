@@ -42,8 +42,8 @@ class _BudgetPageState extends State<BudgetPage> {
 
   // Show add budget dialog
   void _showAddBudgetDialog(BuildContext context) {
-    final TextEditingController _categoryNameController = TextEditingController();
-    final TextEditingController _amountController = TextEditingController();
+    final TextEditingController categoryNameController = TextEditingController();
+    final TextEditingController amountController = TextEditingController();
 
     showDialog(
       context: context,
@@ -54,11 +54,11 @@ class _BudgetPageState extends State<BudgetPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: _categoryNameController,
+                controller: categoryNameController,
                 decoration: const InputDecoration(labelText: "Category Name"),
               ),
               TextField(
-                controller: _amountController,
+                controller: amountController,
                 decoration: const InputDecoration(labelText: "Set Amount"),
                 keyboardType: TextInputType.number,
               ),
@@ -71,8 +71,8 @@ class _BudgetPageState extends State<BudgetPage> {
             ),
             TextButton(
               onPressed: () {
-                String categoryName = _categoryNameController.text.trim();
-                double? budgetAmount = double.tryParse(_amountController.text.trim());
+                String categoryName = categoryNameController.text.trim();
+                double? budgetAmount = double.tryParse(amountController.text.trim());
 
                 if (categoryName.isNotEmpty && budgetAmount != null) {
                   // Save to database
@@ -111,11 +111,7 @@ class _BudgetPageState extends State<BudgetPage> {
 
   @override
   Widget build(BuildContext context) {
-    final categoryModel = Provider.of<CategoryModel>(context);
-    final notBudgetedItems = categoryModel.expenseCategories
-        .where((category) =>
-            !_budgetedItems.any((item) => item['label'] == category['name']))
-        .toList();
+   
 
     return Scaffold(
       appBar: AppBar(
