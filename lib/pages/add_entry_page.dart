@@ -15,7 +15,12 @@ class _AddEntryPageState extends State<AddEntryPage> {
   String amount = '';
 
   final List<String> accounts = ['Airtel Money', 'Bank Transfer', 'Cash'];
-  final List<String> categories = ['Food', 'Transport', 'Entertainment', 'Utilities'];
+  final List<String> categories = [
+    'Food',
+    'Transport',
+    'Entertainment',
+    'Utilities'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -101,11 +106,14 @@ class _AddEntryPageState extends State<AddEntryPage> {
                   child: Text(category),
                 );
               }).toList(),
-              onChanged: isIncome ? null : (String? newValue) { // Disable if income
-                setState(() {
-                  selectedCategory = newValue!;
-                });
-              },
+              onChanged: isIncome
+                  ? null
+                  : (String? newValue) {
+                      // Disable if income
+                      setState(() {
+                        selectedCategory = newValue!;
+                      });
+                    },
             ),
             const SizedBox(height: 20),
 
@@ -156,8 +164,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
       shrinkWrap: true,
       crossAxisCount: 4,
       childAspectRatio: 1.5,
-      children:
-          List.generate(12, (index) {
+      children: List.generate(12, (index) {
         String buttonText;
         if (index < 9) {
           buttonText = '${index + 1}';
@@ -174,7 +181,8 @@ class _AddEntryPageState extends State<AddEntryPage> {
             setState(() {
               if (buttonText == '+') {
                 // Handle addition logic if needed
-              } else if (buttonText == 'x') { // Delete last character
+              } else if (buttonText == 'x') {
+                // Delete last character
                 if (amount.isNotEmpty) {
                   amount = amount.substring(0, amount.length - 1);
                 }
@@ -183,21 +191,19 @@ class _AddEntryPageState extends State<AddEntryPage> {
               }
             });
           },
-          child:
-           Card(
-             color:
-               index == 10 ? Colors.blueAccent : index == 11 ? Colors.redAccent : null, // Color for operators
-             child:
-               Center(
-                 child:
-                   Text(
-                     buttonText,
-                     style:
-                       const TextStyle(fontSize:
-                         24),
-                   ),
-               ),
-           ),
+          child: Card(
+            color: index == 10
+                ? Colors.blueAccent
+                : index == 11
+                    ? Colors.redAccent
+                    : null, // Color for operators
+            child: Center(
+              child: Text(
+                buttonText,
+                style: const TextStyle(fontSize: 24),
+              ),
+            ),
+          ),
         );
       }),
     );

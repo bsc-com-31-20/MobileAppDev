@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -110,6 +111,12 @@ class _BudgetPageState extends State<BudgetPage> {
 
   @override
   Widget build(BuildContext context) {
+    final categoryModel = Provider.of<CategoryModel>(context);
+    final notBudgetedItems = categoryModel.expenseCategories
+        .where((category) =>
+            !_budgetedItems.any((item) => item['label'] == category['name']))
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Budget Page'),
@@ -137,9 +144,11 @@ class _BudgetPageState extends State<BudgetPage> {
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedMonth = newValue!;
-                      });
+                      if (mounted) {
+                        setState(() {
+                          _selectedMonth = newValue!;
+                        });
+                      }
                     },
                   ),
                 ],
@@ -150,6 +159,8 @@ class _BudgetPageState extends State<BudgetPage> {
               const SizedBox(height: 10),
               Column(
                 children: _budgetedItems.map((item) {
+                  double remaining =
+                      (item['amount'] ?? 0.0) - (item['spent'] ?? 0.0);
                   return ListTile(
                     leading: const Icon(Icons.category, size: 40),
                     title: Text(item['category_name'] ?? '',

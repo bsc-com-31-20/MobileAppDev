@@ -9,8 +9,7 @@ class AccountsPage extends StatefulWidget {
 }
 
 class _AccountsPageState extends State<AccountsPage> {
-  List<Map<String, dynamic>> accounts = [
-  ];
+  List<Map<String, dynamic>> accounts = [];
 
   double totalBalance = 0;
   double expenseSoFar = 0;
@@ -19,54 +18,54 @@ class _AccountsPageState extends State<AccountsPage> {
   @override
   void initState() {
     super.initState();
-    _fetchAccountsFromDatabase();  // Fetch accounts from Supabase
+    _fetchAccountsFromDatabase(); // Fetch accounts from Supabase
   }
 
   // Fetch accounts from Supabase
   // Fetch accounts from Supabase
 // Fetch accounts from Supabase
-Future<void> _fetchAccountsFromDatabase() async {
-  try {
-    final user = Supabase.instance.client.auth.currentUser;
+  Future<void> _fetchAccountsFromDatabase() async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
 
-    if (user != null) {
-      final response = await Supabase.instance.client
-          .from('accounts')
-          .select()
-          .eq('user_id', user.id)
-          .execute();
+      if (user != null) {
+        final response = await Supabase.instance.client
+            .from('accounts')
+            .select()
+            .eq('user_id', user.id)
+            .execute();
 
-      if (response.status == 200 && response.data != null) {
-        setState(() {
-          // Ensure ignored is false if null
-          accounts = List<Map<String, dynamic>>.from(response.data.map((account) {
-            return {
-              'type': account['type'],
-              'balance': account['balance'],
-              'ignored': account['ignored'] ?? false,  // Set ignored to false if null
-            };
-          }));
-          _calculateTotalBalance();  // Recalculate total balance after fetching
-        });
-      } else {
-        print('Error fetching accounts: ${response.status}');
-        // Handle the error appropriately, such as showing a SnackBar
+        if (response.status == 200 && response.data != null) {
+          setState(() {
+            // Ensure ignored is false if null
+            accounts =
+                List<Map<String, dynamic>>.from(response.data.map((account) {
+              return {
+                'type': account['type'],
+                'balance': account['balance'],
+                'ignored':
+                    account['ignored'] ?? false, // Set ignored to false if null
+              };
+            }));
+            _calculateTotalBalance(); // Recalculate total balance after fetching
+          });
+        } else {
+          print('Error fetching accounts: ${response.status}');
+          // Handle the error appropriately, such as showing a SnackBar
+        }
       }
+    } catch (error) {
+      print('Unexpected error: $error');
+      // Handle unexpected errors
     }
-  } catch (error) {
-    print('Unexpected error: $error');
-    // Handle unexpected errors
   }
-}
-
 
   void _calculateTotalBalance() {
-  totalBalance = accounts.fold(
-    0.0,
-    (sum, account) => sum + (account['balance'] ?? 0.0),
-  );
-}
-
+    totalBalance = accounts.fold(
+      0.0,
+      (sum, account) => sum + (account['balance'] ?? 0.0),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -203,90 +202,86 @@ Future<void> _fetchAccountsFromDatabase() async {
     );
   }
 
-    // Add a new account and save it to the database
-void _showAddAccountDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AddAccountDialog(
-        onSave: (String type, String balance, IconData icon) async {
-          double parsedBalance = double.tryParse(balance) ?? 0.0;
+  // Add a new account and save it to the database
+  void _showAddAccountDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AddAccountDialog(
+          onSave: (String type, String balance, IconData icon) async {
+            double parsedBalance = double.tryParse(balance) ?? 0.0;
 
-          setState(() {
-            accounts.add({
-              'type': type,
-              'balance': parsedBalance,
+            setState(() {
+              accounts.add({
+                'type': type,
+                'balance': parsedBalance,
+              });
+              _calculateTotalBalance();
             });
-            _calculateTotalBalance();
-          });
 
-          final user = Supabase.instance.client.auth.currentUser;
+            final user = Supabase.instance.client.auth.currentUser;
 
-          if (user != null) {
-            // Save account to the database
-            final response = await Supabase.instance.client
-                .from('accounts')
-                .insert({
-                  'type': type,  // Using 'type' instead of 'name'
-                  'balance': parsedBalance,
-                  'user_id': user.id,
-                })
-                .execute();
+            if (user != null) {
+              // Save account to the database
+              final response =
+                  await Supabase.instance.client.from('accounts').insert({
+                'type': type, // Using 'type' instead of 'name'
+                'balance': parsedBalance,
+                'user_id': user.id,
+              }).execute();
 
-            if (response.status != 200) {
-              print('Error adding account: ${response.status}');
-              // Handle error (e.g., show a SnackBar)
+              if (response.status != 200) {
+                print('Error adding account: ${response.status}');
+                // Handle error (e.g., show a SnackBar)
+              }
             }
-          }
-        },
-      );
-    },
-  );
-}
+          },
+        );
+      },
+    );
+  }
 
+  void _showEditAccountDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AddAccountDialog(
+          account: accounts[index],
+          onSave: (String type, String balance, IconData icon) async {
+            double parsedBalance = double.tryParse(balance) ?? 0.0;
 
+            setState(() {
+              accounts[index]['type'] = type;
+              accounts[index]['balance'] = parsedBalance;
+              _calculateTotalBalance();
+            });
 
+            final user = Supabase.instance.client.auth.currentUser;
 
-    void _showEditAccountDialog(BuildContext context, int index) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AddAccountDialog(
-        account: accounts[index],
-        onSave: (String type, String balance, IconData icon) async {
-          double parsedBalance = double.tryParse(balance) ?? 0.0;
+            if (user != null) {
+              // Update account in the database
+              final response = await Supabase.instance.client
+                  .from('accounts')
+                  .update({
+                    'type': type,
+                    'balance': parsedBalance,
+                  })
+                  .eq(
+                      'id',
+                      accounts[index]
+                          ['id']) // Use 'id' for record identification
+                  .execute();
 
-          setState(() {
-            accounts[index]['type'] = type;
-            accounts[index]['balance'] = parsedBalance;
-            _calculateTotalBalance();
-          });
-
-          final user = Supabase.instance.client.auth.currentUser;
-
-          if (user != null) {
-            // Update account in the database
-            final response = await Supabase.instance.client
-                .from('accounts')
-                .update({
-                  'type': type,
-                  'balance': parsedBalance,
-                })
-                .eq('id', accounts[index]['id'])  // Use 'id' for record identification
-                .execute();
-
-            if (response.status != 200) {
-              print('Error updating account: ${response.status}');
-              // Handle error (e.g., show a snackbar)
+              if (response.status != 200) {
+                print('Error updating account: ${response.status}');
+                // Handle error (e.g., show a snackbar)
+              }
             }
-          }
-        },
-      );
-    },
-  );
-}
-
-
+          },
+        );
+      },
+    );
+  }
 
   void _showIgnoreConfirmationDialog(BuildContext context, int index) {
     showDialog(

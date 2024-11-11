@@ -3,6 +3,7 @@ import 'package:flutter_application_1/pages/profile_page.dart';
 import 'budget_page.dart';
 import 'analysis_page.dart';
 import 'accounts_page.dart';
+import 'category_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +17,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     const AnalysisPage(),
-    const Center(child: Text('Categories Page')),
+    const CategoryPage(),
     const BudgetPage(),
     const AccountsPage(),
     const ProfilePage(),  // Assuming this is non-const for a reason
