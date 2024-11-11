@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -24,8 +25,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   // Function to pick a new image
   Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       setState(() {
@@ -50,12 +51,12 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Update Profile'),
+        title: const Text('Update Profile'),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
       body: _isSaving
-          ? Center(child: CircularProgressIndicator()) // Show progress when saving
+          ? const Center(child: CircularProgressIndicator()) // Show progress when saving
           : Padding(
               padding: const EdgeInsets.all(20.0),
               child: SingleChildScrollView(
@@ -84,7 +85,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
                     // First Name Field
                     _buildInputField(
@@ -92,7 +93,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       label: 'First Name',
                       icon: Icons.person,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
                     // Last Name Field
                     _buildInputField(
@@ -100,7 +101,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       label: 'Last Name',
                       icon: Icons.person_outline,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
                     // Email Field
                     _buildInputField(
@@ -109,7 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: Icons.email,
                       keyboardType: TextInputType.emailAddress,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
                     // Phone Number Field
                     _buildInputField(
@@ -118,7 +119,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: Icons.phone,
                       keyboardType: TextInputType.phone,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
                     // Password Field
                     _buildInputField(
@@ -127,7 +128,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: Icons.lock,
                       isObscure: true,
                     ),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
 
                     // Save Changes Button
                     ElevatedButton(
@@ -135,12 +136,12 @@ class _SettingsPageState extends State<SettingsPage> {
                         _saveProfile();
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Save Changes',
                         style: TextStyle(fontSize: 18),
                       ),
@@ -189,19 +190,19 @@ class _SettingsPageState extends State<SettingsPage> {
       });
 
       // Simulate saving process (e.g., sending to backend)
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 2), () {
         setState(() {
           _isSaving = false;
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile updated successfully')),
+          const SnackBar(content: Text('Profile updated successfully')),
         );
       });
     } else {
       // Show error message if fields are empty
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill all fields')),
+        const SnackBar(content: Text('Please fill all fields')),
       );
     }
   }

@@ -79,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SettingsPage()),
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
               );
             },
           )
@@ -152,8 +152,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                     // Income (Static value or replace with dynamic if needed)
-                    Column(
-                      children: const [
+                    const Column(
+                      children: [
                         Text(
                           'MK280,000',
                           style: TextStyle(
@@ -216,7 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SettingsPage()),
+                        MaterialPageRoute(builder: (context) => const SettingsPage()),
                       );
                     },
                   ),
