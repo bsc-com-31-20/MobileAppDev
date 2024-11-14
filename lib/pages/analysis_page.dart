@@ -57,7 +57,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -87,7 +86,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 20),
 
-              
               const Text(
                 'Analysis',
                 style: TextStyle(
@@ -97,7 +95,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 20),
 
-              
               const Text(
                 'Monthly records',
                 style: TextStyle(
@@ -107,7 +104,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
               ),
               const SizedBox(height: 10),
 
-              
               Column(
                 children: _records.map((record) {
                   return ListTile(
@@ -149,9 +145,9 @@ class _AnalysisPageState extends State<AnalysisPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddEntryPage()),
-    );
+            context,
+            MaterialPageRoute(builder: (context) => AddEntryPage()),
+          );
         },
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, size: 40),
@@ -159,7 +155,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
     );
   }
 
-  
   Widget _buildLegendItem(IconData icon, String label, Color color) {
     return Row(
       children: [

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'category_model.dart';
+import 'add_entry_page.dart'; // Added import for AddEntryPage
 
 class BudgetPage extends StatefulWidget {
   const BudgetPage({super.key});
@@ -322,6 +323,16 @@ class _BudgetPageState extends State<BudgetPage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddEntryPage()),
+          );
+        },
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.add, size: 40),
       ),
     );
   }
