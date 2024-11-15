@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'add_entry_page.dart';
+import 'package:pie_chart/pie_chart.dart';
 
 class AnalysisPage extends StatefulWidget {
   const AnalysisPage({super.key});
@@ -9,31 +10,39 @@ class AnalysisPage extends StatefulWidget {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
-  String _selectedMonth = 'September 2024';
+  String _selectedMonth = 'November 2024';
+  String _overviewType = 'Expense Overview';
 
-  final List<Map<String, dynamic>> _records = [
-    {
-      'icon': Icons.fastfood,
-      'label': 'Food - Airtel Money',
-      'date': '13th September 2024',
-      'amount': '-MK2,000',
-      'color': Colors.red
-    },
-    {
-      'icon': Icons.account_balance,
-      'label': 'Upkeep - National Bank',
-      'date': '12th September 2024',
-      'amount': 'MK280,000',
-      'color': Colors.green
-    },
-    {
-      'icon': Icons.fastfood,
-      'label': 'Food - Airtel Money',
-      'date': '8th September 2024',
-      'amount': '-MK6,500',
-      'color': Colors.red
-    },
+  // List of expenses
+  final List<Map<String, dynamic>> _expenses = [
+    {"category": "Food", "amount": 20000.0},
+    {"category": "Education", "amount": 50000.0},
+    {"category": "Electronics", "amount": 10000.0},
   ];
+
+  // Expense data for pie chart
+  Map<String, double> _expenseData = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _calculateExpenseData();
+  }
+
+  // Method to calculate expense data for pie chart
+  void _calculateExpenseData() {
+    Map<String, double> data = {};
+
+    for (var expense in _expenses) {
+      String category = expense["category"];
+      double amount = expense["amount"];
+      data[category] = (data[category] ?? 0) + amount;
+    }
+
+    setState(() {
+      _expenseData = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,104 +51,99 @@ class _AnalysisPageState extends State<AnalysisPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'StudentBudget',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.arrow_back_ios, color: Colors.black),
+            const SizedBox(width: 8),
+            Text(
+              _selectedMonth,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(Icons.arrow_forward_ios, color: Colors.black),
+          ],
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Selected month:',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  DropdownButton<String>(
-                    value: _selectedMonth,
-                    items: const <String>[
-                      'September 2024',
-                      'October 2024',
-                      'November 2024'
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedMonth = newValue!;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header Row with Expense, Income, and Total
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildStatColumn('EXPENSE', 'K90,000.00', Colors.red),
+                _buildStatColumn('INCOME', 'K130,000.00', Colors.green),
+                _buildStatColumn('TOTAL', 'K40,000.00', Colors.blue),
+              ],
+            ),
+            const SizedBox(height: 20),
 
-              const Text(
-                'Analysis',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+            // Dropdown for Expense/Income Overview with border
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 1),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: DropdownButton<String>(
+                value: _overviewType,
+                isExpanded: true,
+                underline: SizedBox(),
+                items: const [
+                  DropdownMenuItem(
+                      value: 'Expense Overview',
+                      child: Text('Expense Overview')),
+                  DropdownMenuItem(
+                      value: 'Income Overview', child: Text('Income Overview')),
+                ],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _overviewType = newValue!;
+                  });
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Dynamic Pie Chart
+            Expanded(
+              child: Center(
+                child: PieChart(
+                  dataMap: _expenseData,
+                  animationDuration: const Duration(milliseconds: 800),
+                  chartType: ChartType.ring,
+                  colorList: [Colors.red, Colors.yellow, Colors.purple],
+                  chartValuesOptions: const ChartValuesOptions(
+                    showChartValuesInPercentage: true,
+                    showChartValuesOutside: false,
+                  ),
+                  legendOptions: const LegendOptions(
+                    showLegends: false,
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+            ),
+            const SizedBox(height: 20),
 
-              const Text(
-                'Monthly records',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              Column(
-                children: _records.map((record) {
-                  return ListTile(
-                    leading: Icon(record['icon'], size: 40),
-                    title: Text(
-                      record['label'],
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    subtitle: Text(
-                      record['date'],
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    trailing: Text(
-                      record['amount'],
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: record['color'],
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 20),
-
-              // Remove Ads Section
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.block, size: 30, color: Colors.red),
-                  SizedBox(width: 10),
-                  Text('Remove Ads - MK3,500', style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            ],
-          ),
+            // Legend for Pie Chart Categories
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLegendItem(Icons.circle, 'Food', Colors.red),
+                const SizedBox(width: 20),
+                _buildLegendItem(Icons.circle, 'Education', Colors.yellow),
+                const SizedBox(width: 20),
+                _buildLegendItem(Icons.circle, 'Electronics', Colors.purple),
+              ],
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -147,11 +151,27 @@ class _AnalysisPageState extends State<AnalysisPage> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddEntryPage()),
-          );
+          ).then((value) {
+            // Optionally, recalculate the data if a new entry is added
+            _calculateExpenseData();
+          });
         },
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, size: 40),
       ),
+    );
+  }
+
+  Widget _buildStatColumn(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 5),
+        Text(value,
+            style: TextStyle(
+                fontSize: 18, color: color, fontWeight: FontWeight.bold)),
+      ],
     );
   }
 
