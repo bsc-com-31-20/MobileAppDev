@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'add_entry_page.dart'; // Import AddEntryPage
 
 class AccountsPage extends StatefulWidget {
   const AccountsPage({super.key});
@@ -21,9 +22,6 @@ class _AccountsPageState extends State<AccountsPage> {
     _fetchAccountsFromDatabase(); // Fetch accounts from Supabase
   }
 
-  // Fetch accounts from Supabase
-  // Fetch accounts from Supabase
-// Fetch accounts from Supabase
   Future<void> _fetchAccountsFromDatabase() async {
     try {
       final user = Supabase.instance.client.auth.currentUser;
@@ -37,26 +35,22 @@ class _AccountsPageState extends State<AccountsPage> {
 
         if (response.status == 200 && response.data != null) {
           setState(() {
-            // Ensure ignored is false if null
             accounts =
                 List<Map<String, dynamic>>.from(response.data.map((account) {
               return {
                 'type': account['type'],
                 'balance': account['balance'],
-                'ignored':
-                    account['ignored'] ?? false, // Set ignored to false if null
+                'ignored': account['ignored'] ?? false,
               };
             }));
-            _calculateTotalBalance(); // Recalculate total balance after fetching
+            _calculateTotalBalance();
           });
         } else {
           print('Error fetching accounts: ${response.status}');
-          // Handle the error appropriately, such as showing a SnackBar
         }
       }
     } catch (error) {
       print('Unexpected error: $error');
-      // Handle unexpected errors
     }
   }
 
@@ -126,6 +120,16 @@ class _AccountsPageState extends State<AccountsPage> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddEntryPage()),
+          );
+        },
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.add, size: 40),
       ),
     );
   }
@@ -202,7 +206,6 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
-  // Add a new account and save it to the database
   void _showAddAccountDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -222,17 +225,15 @@ class _AccountsPageState extends State<AccountsPage> {
             final user = Supabase.instance.client.auth.currentUser;
 
             if (user != null) {
-              // Save account to the database
               final response =
                   await Supabase.instance.client.from('accounts').insert({
-                'type': type, // Using 'type' instead of 'name'
+                'type': type,
                 'balance': parsedBalance,
                 'user_id': user.id,
               }).execute();
 
               if (response.status != 200) {
                 print('Error adding account: ${response.status}');
-                // Handle error (e.g., show a SnackBar)
               }
             }
           },
@@ -259,22 +260,17 @@ class _AccountsPageState extends State<AccountsPage> {
             final user = Supabase.instance.client.auth.currentUser;
 
             if (user != null) {
-              // Update account in the database
               final response = await Supabase.instance.client
                   .from('accounts')
                   .update({
                     'type': type,
                     'balance': parsedBalance,
                   })
-                  .eq(
-                      'id',
-                      accounts[index]
-                          ['id']) // Use 'id' for record identification
+                  .eq('id', accounts[index]['id'])
                   .execute();
 
               if (response.status != 200) {
                 print('Error updating account: ${response.status}');
-                // Handle error (e.g., show a snackbar)
               }
             }
           },
@@ -504,7 +500,6 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   }
 }
 
-// Account Details Page with Cross (X) button on the left
 class AccountDetailsPage extends StatelessWidget {
   final String accountName;
   final String balance;
@@ -519,11 +514,11 @@ class AccountDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Removes default back arrow
+        automaticallyImplyLeading: false,
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () {
-            Navigator.pop(context); // Go back to the previous screen
+            Navigator.pop(context);
           },
         ),
         title: const Text('Account Details'),

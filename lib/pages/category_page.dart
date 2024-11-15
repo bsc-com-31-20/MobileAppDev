@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'category_model.dart'; // Import the shared CategoryModel
+import 'add_entry_page.dart'; // Import the calculator (AddEntryPage)
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -66,6 +67,16 @@ class _CategoryPageState extends State<CategoryPage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddEntryPage()),
+          );
+        },
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.add, size: 40),
       ),
     );
   }

@@ -195,12 +195,25 @@ class _AnalysisPageState extends State<AnalysisPage> {
         onPressed: () {
           Navigator.push(
             context,
+            MaterialPageRoute(builder: (context) => AddEntryPage()),
+          );
+            context,
             MaterialPageRoute(builder: (context) => const AddEntryPage()),
           );
         },
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, size: 40),
       ),
+    );
+  }
+
+  Widget _buildLegendItem(IconData icon, String label, Color color) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 20),
+        const SizedBox(width: 8),
+        Text(label, style: const TextStyle(fontSize: 16)),
+      ],
     );
   }
 }

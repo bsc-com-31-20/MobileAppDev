@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+import 'category_model.dart';
+import 'add_entry_page.dart'; // Added import for AddEntryPage
 
 class BudgetPage extends StatefulWidget {
   const BudgetPage({super.key});
@@ -14,36 +16,19 @@ class _BudgetPageState extends State<BudgetPage> {
   List<Map<String, dynamic>> _budgetedItems = [];
 
   @override
-  void initState() {
-    super.initState();
-    _fetchBudgets();  // Fetch budgeted items on page load
+  void dispose() {
+    super.dispose();
   }
 
-  // Fetch budgeted items from Supabase
-  Future<void> _fetchBudgets() async {
-    final user = Supabase.instance.client.auth.currentUser;
+  double get _totalBudget =>
+      _budgetedItems.fold(0.0, (sum, item) => sum + (item['amount'] ?? 0.0));
+  double get _totalSpent =>
+      _budgetedItems.fold(0.0, (sum, item) => sum + (item['spent'] ?? 0.0));
 
-    if (user != null) {
-      final response = await Supabase.instance.client
-          .from('categories')
-          .select('category_name, budget')
-          .eq('user_id', user.id)
-          .execute();
-
-      if (response.status == 200 && response.data != null) {
-        setState(() {
-          _budgetedItems = List<Map<String, dynamic>>.from(response.data);
-        });
-      } else {
-        print('Error fetching budgets: ${response.status}');
-      }
-    }
-  }
-
-  // Show add budget dialog
-  void _showAddBudgetDialog(BuildContext context) {
-    final TextEditingController categoryNameController = TextEditingController();
-    final TextEditingController amountController = TextEditingController();
+  void _showBudgetDialog(Map<String, dynamic> item, {bool isEdit = false}) {
+    TextEditingController _limitController = TextEditingController(
+      text: isEdit ? (item['amount']?.toString() ?? '0') : '',
+    );
 
     showDialog(
       context: context,
@@ -71,12 +56,23 @@ class _BudgetPageState extends State<BudgetPage> {
             ),
             TextButton(
               onPressed: () {
-                String categoryName = categoryNameController.text.trim();
-                double? budgetAmount = double.tryParse(amountController.text.trim());
+                if (_limitController.text.isNotEmpty) {
+                  setState(() {
+                    double limit =
+                        double.tryParse(_limitController.text) ?? 0.0;
 
-                if (categoryName.isNotEmpty && budgetAmount != null) {
-                  // Save to database
-                  _addBudgetToDatabase(categoryName, budgetAmount);
+                    if (isEdit) {
+                      item['amount'] = limit; // Update amount if editing
+                    } else {
+                      _budgetedItems.add({
+                        'icon': item['icon'] ?? Icons.category,
+                        'label': item['label'] ?? item['name'] ?? 'Unnamed',
+                        'amount': limit,
+                        'spent': 0.0,
+                        'monthYear': _selectedMonth,
+                      });
+                    }
+                  });
                   Navigator.pop(context);
                 }
               },
@@ -88,30 +84,48 @@ class _BudgetPageState extends State<BudgetPage> {
     );
   }
 
-  // Add budget to Supabase database
-  Future<void> _addBudgetToDatabase(String categoryName, double budgetAmount) async {
-    final user = Supabase.instance.client.auth.currentUser;
-
-    if (user != null) {
-      final response = await Supabase.instance.client
-          .from('categories')
-          .insert({
-            'category_name': categoryName,
-            'budget': budgetAmount,
-          })
-          .execute();
-
-      if (response.status == 201) {
-        _fetchBudgets(); // Refresh the budgeted items list after adding a new entry
-      } else {
-        print('Error adding budget: ${response.status}');
-      }
-    }
+  void _showRemoveConfirmationDialog(Map<String, dynamic> item) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Remove this budget?',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'Budget over this category will be removed for this month. Are you sure?',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('NO'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _budgetedItems.remove(item);
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('YES'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-   
+    final categoryModel = Provider.of<CategoryModel>(context);
+    final notBudgetedItems = categoryModel.expenseCategories
+        .where((category) =>
+            !_budgetedItems.any((item) => item['label'] == category['name']))
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -173,29 +187,47 @@ class _BudgetPageState extends State<BudgetPage> {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    _showAddBudgetDialog(context);
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('ADD NEW BUDGET'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    minimumSize: const Size(180, 60), // Adjust the size as needed
-                    side: const BorderSide(color: Colors.black),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+              const SizedBox(height: 30),
+
+              // Display not budgeted items
+              const Text(
+                'Not budgeted items:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Column(
+                children: notBudgetedItems.map((item) {
+                  return ListTile(
+                    leading: Icon(item['icon'] ?? Icons.category, size: 40),
+                    title: Text(item['name'] ?? 'Unnamed',
+                        style: const TextStyle(fontSize: 16)),
+                    trailing: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.black),
+                      ),
+                      onPressed: () => _showBudgetDialog(item),
+                      child: const Text(
+                        'SET BUDGET',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                }).toList(),
               ),
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddEntryPage()),
+          );
+        },
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.add, size: 40),
       ),
     );
   }
