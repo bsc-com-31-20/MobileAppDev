@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'add_entry_page.dart';
+import 'package:intl/intl.dart'; // For date formatting
 import 'package:pie_chart/pie_chart.dart';
+import 'add_entry_page.dart';
 
 class AnalysisPage extends StatefulWidget {
   const AnalysisPage({super.key});
@@ -10,7 +11,7 @@ class AnalysisPage extends StatefulWidget {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
-  String _selectedMonth = 'November 2024';
+  DateTime _currentMonth = DateTime(2024, 11); // Initialize to November 2024
   String _overviewType = 'Expense Overview';
 
   // List of expenses
@@ -31,17 +32,50 @@ class _AnalysisPageState extends State<AnalysisPage> {
 
   // Method to calculate expense data for pie chart
   void _calculateExpenseData() {
+    double totalAmount =
+        _expenses.fold(0.0, (sum, expense) => sum + expense["amount"]);
     Map<String, double> data = {};
 
     for (var expense in _expenses) {
       String category = expense["category"];
       double amount = expense["amount"];
-      data[category] = (data[category] ?? 0) + amount;
+      double percentage = (amount / totalAmount) * 100;
+      data[category] = percentage;
     }
 
     setState(() {
       _expenseData = data;
     });
+  }
+
+  // Update the current month and format it
+  void _updateMonth(int increment) {
+    setState(() {
+      _currentMonth = DateTime(
+        _currentMonth.year,
+        _currentMonth.month + increment,
+      );
+    });
+  }
+
+  String _getFormattedMonth() {
+    final List<String> months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    String month = months[_currentMonth.month - 1];
+    int year = _currentMonth.year;
+    return " $month $year "; // Angle brackets format
   }
 
   @override
@@ -52,20 +86,24 @@ class _AnalysisPageState extends State<AnalysisPage> {
         elevation: 0,
         centerTitle: true,
         title: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(Icons.arrow_back_ios, color: Colors.black),
-            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.arrow_left, color: Colors.black),
+              onPressed: () => _updateMonth(-1),
+            ),
             Text(
-              _selectedMonth,
+              _getFormattedMonth(),
               style: const TextStyle(
                 color: Colors.black,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
               ),
             ),
-            const SizedBox(width: 8),
-            Icon(Icons.arrow_forward_ios, color: Colors.black),
+            IconButton(
+              icon: const Icon(Icons.arrow_right, color: Colors.black),
+              onPressed: () => _updateMonth(1),
+            ),
           ],
         ),
       ),
@@ -95,7 +133,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
               child: DropdownButton<String>(
                 value: _overviewType,
                 isExpanded: true,
-                underline: SizedBox(),
+                underline: const SizedBox(),
                 items: const [
                   DropdownMenuItem(
                       value: 'Expense Overview',
@@ -112,36 +150,66 @@ class _AnalysisPageState extends State<AnalysisPage> {
             ),
             const SizedBox(height: 20),
 
-            // Dynamic Pie Chart
+            // Dynamic Pie Chart and Legend
             Expanded(
-              child: Center(
-                child: PieChart(
-                  dataMap: _expenseData,
-                  animationDuration: const Duration(milliseconds: 800),
-                  chartType: ChartType.ring,
-                  colorList: [Colors.red, Colors.yellow, Colors.purple],
-                  chartValuesOptions: const ChartValuesOptions(
-                    showChartValuesInPercentage: true,
-                    showChartValuesOutside: false,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Pie Chart
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        height: 150, // Make the pie chart smaller
+                        width: 150,
+                        child: PieChart(
+                          dataMap: _expenseData,
+                          animationDuration: const Duration(milliseconds: 800),
+                          chartType: ChartType.ring,
+                          colorList: [Colors.red, Colors.yellow, Colors.purple],
+                          chartValuesOptions: const ChartValuesOptions(
+                            showChartValuesInPercentage:
+                                true, // Show percentages
+                            showChartValuesOutside: false,
+                            decimalPlaces: 1,
+                          ),
+                          legendOptions: const LegendOptions(
+                            showLegends: false,
+                          ),
+                        ),
+                      ),
+                      // Center Text
+                      Text(
+                        _overviewType.contains('Expense')
+                            ? 'Expense'
+                            : 'Income',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
-                  legendOptions: const LegendOptions(
-                    showLegends: false,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
 
-            // Legend for Pie Chart Categories
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildLegendItem(Icons.circle, 'Food', Colors.red),
-                const SizedBox(width: 20),
-                _buildLegendItem(Icons.circle, 'Education', Colors.yellow),
-                const SizedBox(width: 20),
-                _buildLegendItem(Icons.circle, 'Electronics', Colors.purple),
-              ],
+                  const SizedBox(width: 20),
+
+                  // Legend for Categories
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLegendItem(Icons.circle, 'Food', Colors.red),
+                      const SizedBox(height: 10),
+                      _buildLegendItem(
+                          Icons.circle, 'Education', Colors.yellow),
+                      const SizedBox(height: 10),
+                      _buildLegendItem(
+                          Icons.circle, 'Electronics', Colors.purple),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
