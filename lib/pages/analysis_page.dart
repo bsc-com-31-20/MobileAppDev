@@ -75,7 +75,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
     ];
     String month = months[_currentMonth.month - 1];
     int year = _currentMonth.year;
-    return " $month $year "; // Angle brackets format
+    return " $month $year ";
   }
 
   @override

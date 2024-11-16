@@ -79,6 +79,80 @@ class _BudgetPageState extends State<BudgetPage> {
     setState(() {});
   }
 
+  // Show dialog to set or change budget
+  void _showBudgetDialog(Map<String, dynamic> item, {bool isNew = false}) {
+    TextEditingController amountController = TextEditingController(
+      text: isNew ? '' : item['amount'].toString(),
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(isNew ? 'Set Budget' : 'Change Budget Limit'),
+          content: TextField(
+            controller: amountController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: 'Enter amount'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  if (isNew) {
+                    _budgetedItems.add({
+                      'icon': item['icon'],
+                      'label': item['name'],
+                      'amount': double.parse(amountController.text),
+                      'spent': 0.0,
+                    });
+                  } else {
+                    item['amount'] = double.parse(amountController.text);
+                  }
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('SAVE'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Show confirmation dialog to remove budget
+  void _showRemoveConfirmationDialog(Map<String, dynamic> item) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Remove Budget'),
+          content: Text(
+              'Are you sure you want to remove the budget for "${item['label']}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _budgetedItems.remove(item);
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('REMOVE'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final categoryModel = Provider.of<CategoryModel>(context);
@@ -197,9 +271,9 @@ class _BudgetPageState extends State<BudgetPage> {
                       icon: const Icon(Icons.more_horiz),
                       onSelected: (value) {
                         if (value == 'change') {
-                          // _showBudgetDialog (unchanged)
+                          _showBudgetDialog(item);
                         } else if (value == 'remove') {
-                          // _showRemoveConfirmationDialog (unchanged)
+                          _showRemoveConfirmationDialog(item);
                         }
                       },
                       itemBuilder: (context) => [
@@ -232,7 +306,7 @@ class _BudgetPageState extends State<BudgetPage> {
                         side: const BorderSide(color: Colors.black),
                       ),
                       onPressed: () {
-                        // _showBudgetDialog (unchanged)
+                        _showBudgetDialog(item, isNew: true);
                       },
                       child: const Text(
                         'SET BUDGET',
