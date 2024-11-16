@@ -17,10 +17,10 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     const AnalysisPage(),
-    const CategoryPage(),
     const BudgetPage(),
     const AccountsPage(),
-    const ProfilePage(),  // Assuming this is non-const for a reason
+    const CategoryPage(),
+    ProfilePage(), // Assuming this is non-const for a reason
   ];
 
   void _onItemTapped(int index) {
@@ -40,16 +40,16 @@ class _HomePageState extends State<HomePage> {
             label: 'Analysis',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Categories',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_wallet),
             label: 'Budgets',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_balance),
             label: 'Accounts',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.category),
+            label: 'Categories',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
