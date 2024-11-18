@@ -91,26 +91,26 @@ class _AnalysisPageState extends State<AnalysisPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blueAccent,
         elevation: 0,
         centerTitle: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_left, color: Colors.black),
+              icon: const Icon(Icons.arrow_left, color: Colors.white),
               onPressed: () => _updateMonth(-1),
             ),
             Text(
               _getFormattedMonth(),
               style: const TextStyle(
-                color: Colors.black,
+                color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.arrow_right, color: Colors.black),
+              icon: const Icon(Icons.arrow_right, color: Colors.white),
               onPressed: () => _updateMonth(1),
             ),
           ],

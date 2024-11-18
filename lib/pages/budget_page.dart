@@ -178,26 +178,26 @@ class _BudgetPageState extends State<BudgetPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blueAccent,
         elevation: 0,
         centerTitle: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_left, color: Colors.black),
+              icon: const Icon(Icons.arrow_left, color: Colors.white),
               onPressed: () => _changeMonth(false),
             ),
             Text(
               _selectedMonth,
               style: const TextStyle(
-                color: Colors.black,
+                color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.arrow_right, color: Colors.black),
+              icon: const Icon(Icons.arrow_right, color: Colors.white),
               onPressed: () => _changeMonth(true),
             ),
           ],
@@ -218,14 +218,14 @@ class _BudgetPageState extends State<BudgetPage> {
                     children: [
                       const Text(
                         'TOTAL BUDGET',
-                        style: TextStyle(color: Colors.black, fontSize: 14),
+                        style: TextStyle(color: Colors.black, fontSize: 14,fontWeight: FontWeight.bold),
                       ),
                       Text(
                         'MK${_totalBudget.toStringAsFixed(2)}',
                         style: const TextStyle(
-                          color: Colors.black,
+                          color: Colors.green,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          
                         ),
                       ),
                     ],
@@ -235,14 +235,14 @@ class _BudgetPageState extends State<BudgetPage> {
                     children: [
                       const Text(
                         'TOTAL SPENT',
-                        style: TextStyle(color: Colors.black, fontSize: 14),
+                        style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         'MK${_totalSpent.toStringAsFixed(2)}',
                         style: const TextStyle(
-                          color: Colors.black,
+                          color: Colors.red,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                
                         ),
                       ),
                     ],

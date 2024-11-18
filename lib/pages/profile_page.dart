@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/accounts_page.dart';
+import 'package:flutter_application_1/pages/analysis_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -67,12 +69,17 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        
         title: const Text(
-          'User Profile',
-          style: TextStyle(fontSize: 18, color: Colors.white),
+          'Profile',
+          style: TextStyle(
+                fontWeight:FontWeight.bold,
+                fontSize: 24, 
+                color: Colors.white
+              ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -187,7 +194,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     title: const Text('Financial Overview'),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      // Navigate to financial overview
+                      Navigator.push(
+                        context,
+                       MaterialPageRoute(builder: (context) => const AnalysisPage()),
+                      );
+
                     },
                   ),
                   const Divider(),
@@ -196,8 +207,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     title: const Text('Manage Accounts'),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      // Navigate to card management
-                    },
+                      Navigator.push(
+                        context,
+                       MaterialPageRoute(builder: (context) => const AccountsPage()),
+                      );
+
+                    }
+                      
                   ),
                   const Divider(),
                   ListTile(

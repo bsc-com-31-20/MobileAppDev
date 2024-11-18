@@ -17,16 +17,14 @@ class _CategoryPageState extends State<CategoryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        elevation: 0,
+        backgroundColor: Colors.blueAccent,
         centerTitle: true,
         title: const Text(
           'Categories',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 20,
+            fontSize: 24,
           ),
         ),
       ),
@@ -51,13 +49,13 @@ class _CategoryPageState extends State<CategoryPage> {
                     _showAddCategoryDialog(context, categoryModel);
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('ADD NEW CATEGORY'),
+                  label: const Text('Add Category'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     minimumSize: const Size(180, 60),
-                    side: const BorderSide(color: Colors.black),
+                    side: const BorderSide(color: Colors.white),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),

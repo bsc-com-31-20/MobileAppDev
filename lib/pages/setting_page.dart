@@ -51,9 +51,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Profile'),
+        title: const Text('Update Profile', style: TextStyle(color: Colors.white),),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
+        
       ),
       body: _isSaving
           ? const Center(child: CircularProgressIndicator()) // Show progress when saving
@@ -136,14 +137,18 @@ class _SettingsPageState extends State<SettingsPage> {
                         _saveProfile();
                       },
                       style: ElevatedButton.styleFrom(
+                        backgroundColor:Colors.blueAccent,
                         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: const Text(
                         'Save Changes',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white
+                          ),
                       ),
                     ),
                   ],
@@ -170,7 +175,7 @@ class _SettingsPageState extends State<SettingsPage> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        filled: true,
+        filled: false,
         fillColor: Colors.grey[100],
       ),
     );
