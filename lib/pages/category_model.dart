@@ -54,4 +54,14 @@ class CategoryModel extends ChangeNotifier {
       notifyListeners(); // Notify listeners to update the UI
     }
   }
+
+  // Method to get a category by name (with category type check)
+  Map<String, dynamic>? getCategoryByName(String name, bool isIncomeCategory) {
+    final categoryList =
+        isIncomeCategory ? _incomeCategories : _expenseCategories;
+    return categoryList.firstWhere(
+      (category) => category['name'] == name,
+      orElse: () => {}, // Return an empty map if no category is found
+    );
+  }
 }
