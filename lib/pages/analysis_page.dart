@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For date formatting
+import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:provider/provider.dart';
+import 'account_model.dart';
 import 'add_entry_page.dart';
 
 class AnalysisPage extends StatefulWidget {
@@ -11,44 +13,49 @@ class AnalysisPage extends StatefulWidget {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
-  DateTime _currentMonth = DateTime(2024, 11); // Initialize to November 2024
+  DateTime _currentMonth = DateTime.now();
   String _overviewType = 'Expense Overview';
 
-  // List of expenses
-  final List<Map<String, dynamic>> _expenses = [
-    {"category": "Food", "amount": 20000.0},
-    {"category": "Education", "amount": 50000.0},
-    {"category": "Electronics", "amount": 10000.0},
-  ];
-
-  // Expense data for pie chart
   Map<String, double> _expenseData = {};
+  Map<String, double> _incomeData = {};
 
   @override
   void initState() {
     super.initState();
-    _calculateExpenseData();
-  }
-
-  // Method to calculate expense data for pie chart
-  void _calculateExpenseData() {
-    double totalAmount =
-        _expenses.fold(0.0, (sum, expense) => sum + expense["amount"]);
-    Map<String, double> data = {};
-
-    for (var expense in _expenses) {
-      String category = expense["category"];
-      double amount = expense["amount"];
-      double percentage = (amount / totalAmount) * 100;
-      data[category] = percentage;
-    }
-
-    setState(() {
-      _expenseData = data;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _calculateOverviewData(); // Calculate data after first frame
     });
   }
 
-  // Update the current month and format it
+  void _calculateOverviewData() {
+    final accountModel = Provider.of<AccountModel>(context, listen: false);
+
+    // Aggregate income data
+    Map<String, double> incomeData = {};
+    for (var entry in accountModel.incomeEntries) {
+      final category = entry['category'];
+      final amount = entry['amount'] ?? 0.0;
+      incomeData[category] = (incomeData[category] ?? 0) + amount;
+    }
+
+    // Aggregate expense data
+    Map<String, double> expenseData = {};
+    for (var entry in accountModel.expenseEntries) {
+      final category = entry['category'];
+      final amount = entry['amount'] ?? 0.0;
+      expenseData[category] = (expenseData[category] ?? 0) + amount;
+    }
+
+    setState(() {
+      _incomeData = incomeData;
+      _expenseData = expenseData;
+    });
+  }
+
+  double _getTotal(Map<String, double> data) {
+    return data.values.fold(0, (sum, value) => sum + value);
+  }
+
   void _updateMonth(int increment) {
     setState(() {
       _currentMonth = DateTime(
@@ -59,7 +66,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
   }
 
   String _getFormattedMonth() {
-    final List<String> months = [
+    final months = [
       'January',
       'February',
       'March',
@@ -73,13 +80,15 @@ class _AnalysisPageState extends State<AnalysisPage> {
       'November',
       'December'
     ];
-    String month = months[_currentMonth.month - 1];
-    int year = _currentMonth.year;
-    return " $month $year ";
+    return "${months[_currentMonth.month - 1]} ${_currentMonth.year}";
   }
 
   @override
   Widget build(BuildContext context) {
+    final totalExpense = _getTotal(_expenseData);
+    final totalIncome = _getTotal(_incomeData);
+    final totalBalance = totalIncome - totalExpense;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -112,18 +121,21 @@ class _AnalysisPageState extends State<AnalysisPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header Row with Expense, Income, and Total
+            // Header Row with Totals
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildStatColumn('EXPENSE', 'K90,000.00', Colors.red),
-                _buildStatColumn('INCOME', 'K130,000.00', Colors.green),
-                _buildStatColumn('TOTAL', 'K40,000.00', Colors.blue),
+                _buildStatColumn('EXPENSE',
+                    'K${totalExpense.toStringAsFixed(2)}', Colors.red),
+                _buildStatColumn('INCOME', 'K${totalIncome.toStringAsFixed(2)}',
+                    Colors.green),
+                _buildStatColumn('TOTAL', 'K${totalBalance.toStringAsFixed(2)}',
+                    Colors.blue),
               ],
             ),
             const SizedBox(height: 20),
 
-            // Dropdown for Expense/Income Overview with border
+            // Dropdown for Overview Type
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black, width: 1),
@@ -150,67 +162,16 @@ class _AnalysisPageState extends State<AnalysisPage> {
             ),
             const SizedBox(height: 20),
 
-            // Dynamic Pie Chart and Legend
+            // Pie Chart
             Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Pie Chart
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        height: 150, // Make the pie chart smaller
-                        width: 150,
-                        child: PieChart(
-                          dataMap: _expenseData,
-                          animationDuration: const Duration(milliseconds: 800),
-                          chartType: ChartType.ring,
-                          colorList: [Colors.red, Colors.yellow, Colors.purple],
-                          chartValuesOptions: const ChartValuesOptions(
-                            showChartValuesInPercentage:
-                                true, // Show percentages
-                            showChartValuesOutside: false,
-                            decimalPlaces: 1,
-                          ),
-                          legendOptions: const LegendOptions(
-                            showLegends: false,
-                          ),
-                        ),
-                      ),
-                      // Center Text
-                      Text(
-                        _overviewType.contains('Expense')
-                            ? 'Expense'
-                            : 'Income',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(width: 20),
-
-                  // Legend for Categories
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildLegendItem(Icons.circle, 'Food', Colors.red),
-                      const SizedBox(height: 10),
-                      _buildLegendItem(
-                          Icons.circle, 'Education', Colors.yellow),
-                      const SizedBox(height: 10),
-                      _buildLegendItem(
-                          Icons.circle, 'Electronics', Colors.purple),
-                    ],
-                  ),
-                ],
-              ),
+              child: _overviewType.contains('Expense')
+                  ? _buildPieChart(_expenseData, 'Expense')
+                  : _buildPieChart(_incomeData, 'Income'),
             ),
+
+            // Category Labels
+            const SizedBox(height: 20),
+            _buildCategoryLabels(),
           ],
         ),
       ),
@@ -218,16 +179,117 @@ class _AnalysisPageState extends State<AnalysisPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddEntryPage()),
+            MaterialPageRoute(builder: (context) => const AddEntryPage()),
           ).then((value) {
-            // Optionally, recalculate the data if a new entry is added
-            _calculateExpenseData();
+            _calculateOverviewData(); // Recalculate after adding new entries
           });
         },
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, size: 40),
       ),
     );
+  }
+
+  Widget _buildPieChart(Map<String, double> data, String type) {
+    if (data.isEmpty) {
+      return Center(
+        child: Text(
+          'No $type Data Available',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox(
+          height: 150,
+          width: 150,
+          child: PieChart(
+            dataMap: data,
+            animationDuration: const Duration(milliseconds: 800),
+            chartType: ChartType.ring,
+            colorList: type == 'Expense'
+                ? [Colors.red, Colors.yellow, Colors.purple, Colors.orange]
+                : [Colors.green, Colors.orange, Colors.blue, Colors.cyan],
+            chartValuesOptions: const ChartValuesOptions(
+              showChartValuesInPercentage: true,
+              showChartValuesOutside: false,
+              decimalPlaces: 1,
+            ),
+            legendOptions: const LegendOptions(
+              showLegends: false,
+            ),
+          ),
+        ),
+        Text(
+          type,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryLabels() {
+    // Determine data based on the selected overview type
+    final data = _overviewType.contains('Expense') ? _expenseData : _incomeData;
+
+    if (data.isEmpty) {
+      return const Center(
+        child: Text(
+          'No categories to display.',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+      );
+    }
+
+    // Generate a list of category labels with corresponding colors
+    final categoryWidgets = data.entries.map((entry) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _getCategoryColor(entry.key),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            entry.key,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+        ],
+      );
+    }).toList();
+
+    // Wrap the category widgets in a Wrap layout for responsiveness
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 16,
+      runSpacing: 8,
+      children: categoryWidgets,
+    );
+  }
+
+  // Get a color for the category based on its position in the data map
+  Color _getCategoryColor(String category) {
+    final data = _overviewType.contains('Expense') ? _expenseData : _incomeData;
+    final index = data.keys.toList().indexOf(category);
+
+    // Assign colors from the same list used for the pie chart
+    final colorList = _overviewType.contains('Expense')
+        ? [Colors.red, Colors.yellow, Colors.purple, Colors.orange]
+        : [Colors.green, Colors.orange, Colors.blue, Colors.cyan];
+
+    // Cycle through colors if there are more categories than colors
+    return colorList[index % colorList.length];
   }
 
   Widget _buildStatColumn(String label, String value, Color color) {
@@ -239,16 +301,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
         Text(value,
             style: TextStyle(
                 fontSize: 18, color: color, fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-
-  Widget _buildLegendItem(IconData icon, String label, Color color) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 20),
-        const SizedBox(width: 8),
-        Text(label, style: const TextStyle(fontSize: 16)),
       ],
     );
   }

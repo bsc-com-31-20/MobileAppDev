@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'account_model.dart';
+import 'category_model.dart';
 
 class AddEntryPage extends StatefulWidget {
   const AddEntryPage({super.key});
@@ -16,9 +19,15 @@ class _AddEntryPageState extends State<AddEntryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final accountModel = Provider.of<AccountModel>(context);
+    final categoryModel = Provider.of<CategoryModel>(context);
+
+    final incomeCategories = categoryModel.incomeCategories;
+    final expenseCategories = categoryModel.expenseCategories;
+
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // This removes the default back arrow
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Row(
@@ -28,19 +37,12 @@ class _AddEntryPageState extends State<AddEntryPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: const Icon(Icons.close,
-                  color: Colors.teal), // Cross icon for "CANCEL"
-              label: const Text(
-                'CANCEL',
-                style: TextStyle(color: Colors.teal),
-              ),
+              icon: const Icon(Icons.close, color: Colors.teal),
+              label: const Text('CANCEL', style: TextStyle(color: Colors.teal)),
             ),
             TextButton.icon(
-              onPressed: () {
-                // Handle save action
-              },
-              icon: const Icon(Icons.check,
-                  color: Colors.teal), // Checkmark icon for "SAVE"
+              onPressed: _saveEntry,
+              icon: const Icon(Icons.check, color: Colors.teal),
               label: const Text('SAVE', style: TextStyle(color: Colors.teal)),
             ),
           ],
@@ -49,9 +51,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Toggle Buttons for Income/Expense
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -94,13 +94,24 @@ class _AddEntryPageState extends State<AddEntryPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildButtonWithIcon(Icons.account_balance_wallet, 'Account'),
-                _buildButtonWithIcon(Icons.category, 'Category'),
+                _buildButtonWithIcon(
+                  Icons.account_balance_wallet,
+                  selectedAccount,
+                  () => _showAccountSelector(context, accountModel.accounts),
+                ),
+                _buildButtonWithIcon(
+                  Icons.category,
+                  selectedCategory,
+                  () => _showCategorySelector(
+                    context,
+                    isIncome ? incomeCategories : expenseCategories,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 20),
 
-            // Amount Display with Clear Button
+            // Amount Display
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
               decoration: BoxDecoration(
@@ -132,27 +143,8 @@ class _AddEntryPageState extends State<AddEntryPage> {
             ),
             const SizedBox(height: 20),
 
-            // Calculator Keypad
             Expanded(
               child: _buildCalculator(),
-            ),
-
-            // Date and Time
-            Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    DateFormat('MMM dd, yyyy').format(DateTime.now()),
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                  Text(
-                    DateFormat('hh:mm a').format(DateTime.now()),
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
-              ),
             ),
           ],
         ),
@@ -160,7 +152,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
     );
   }
 
-  Widget _buildButtonWithIcon(IconData icon, String label) {
+  Widget _buildButtonWithIcon(IconData icon, String label, VoidCallback onTap) {
     return ElevatedButton.icon(
       icon: Icon(icon, color: Colors.teal),
       label: Text(label),
@@ -169,13 +161,10 @@ class _AddEntryPageState extends State<AddEntryPage> {
         foregroundColor: Colors.black,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      onPressed: () {
-        // Handle button tap
-      },
+      onPressed: onTap,
     );
   }
 
-  // Calculator layout
   Widget _buildCalculator() {
     const buttonLabels = [
       '+',
@@ -204,43 +193,134 @@ class _AddEntryPageState extends State<AddEntryPage> {
       itemCount: buttonLabels.length,
       itemBuilder: (context, index) {
         final label = buttonLabels[index];
-        return _buildCalculatorButton(label);
+        return InkWell(
+          onTap: () {
+            setState(() {
+              if (label == '=') {
+                // Calculation logic
+              } else if (['+', '-', '×', '÷'].contains(label)) {
+                // Operator logic
+              } else {
+                amount = (amount == '0') ? label : amount + label;
+              }
+            });
+          },
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 24,
+                  color: ['+', '-', '×', '÷'].contains(label)
+                      ? Colors.teal
+                      : Colors.black,
+                ),
+              ),
+            ),
+          ),
+        );
       },
     );
   }
 
-  Widget _buildCalculatorButton(String label) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          if (label == '=') {
-            // Handle calculation (optional: use a package for expression parsing)
-          } else if (label == '÷' ||
-              label == '×' ||
-              label == '-' ||
-              label == '+') {
-            // Handle operators
-          } else {
-            // Append number to amount
-            amount = (amount == '0') ? label : amount + label;
-          }
-        });
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 24,
-              color:
-                  (label == '+' || label == '-' || label == '×' || label == '÷')
-                      ? Colors.teal
-                      : Colors.black,
+  void _showAccountSelector(
+      BuildContext context, List<Map<String, dynamic>> accounts) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ListView(
+          children: [
+            ListTile(
+              title: const Text('Select an Account'),
             ),
-          ),
-        ),
-      ),
+            ...accounts.map((account) {
+              return ListTile(
+                leading: const Icon(Icons.account_balance_wallet),
+                title: Text(account['type']),
+                subtitle: Text('Balance: ${account['balance']}'),
+                onTap: () {
+                  setState(() {
+                    selectedAccount = account['type'];
+                  });
+                  Navigator.pop(context);
+                },
+              );
+            }).toList(),
+          ],
+        );
+      },
     );
+  }
+
+  void _showCategorySelector(
+      BuildContext context, List<Map<String, dynamic>> categories) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return GridView.count(
+          crossAxisCount: 3,
+          padding: const EdgeInsets.all(8),
+          children: categories.map((category) {
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedCategory = category['name'];
+                });
+                Navigator.pop(context);
+              },
+              child: Card(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(category['icon'], size: 40, color: Colors.teal),
+                    const SizedBox(height: 8),
+                    Text(category['name']),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  void _saveEntry() {
+    final accountModel = Provider.of<AccountModel>(context, listen: false);
+    final account = accountModel.getAccountByName(selectedAccount);
+    final double enteredAmount = double.tryParse(amount) ?? 0;
+
+    if (selectedCategory == 'Category' || selectedAccount == 'Account') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please select a valid category and account.')),
+      );
+      return;
+    }
+
+    if (account != null && enteredAmount > 0) {
+      if (isIncome) {
+        account['balance'] += enteredAmount;
+        accountModel.addIncome(selectedCategory, enteredAmount);
+      } else {
+        account['balance'] -= enteredAmount;
+        accountModel.addExpense(selectedCategory, enteredAmount);
+      }
+
+      accountModel.notifyListeners();
+      setState(() {
+        amount = '0';
+      });
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${isIncome ? "Income" : "Expense"} saved!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid entry. Please check again.')),
+      );
+    }
   }
 }

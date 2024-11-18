@@ -1,68 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'add_entry_page.dart'; // Import AddEntryPage
+import 'package:provider/provider.dart';
+import 'add_entry_page.dart'; // Correctly retained import
+import 'account_model.dart';
+import 'add_account_dialog.dart';
+import 'account_details_page.dart';
 
-class AccountsPage extends StatefulWidget {
+class AccountsPage extends StatelessWidget {
   const AccountsPage({super.key});
 
   @override
-  _AccountsPageState createState() => _AccountsPageState();
-}
+  Widget build(BuildContext context) {
+    final accountModel = Provider.of<AccountModel>(context);
+    final accounts = accountModel.accounts;
 
-class _AccountsPageState extends State<AccountsPage> {
-  List<Map<String, dynamic>> accounts = [];
-
-  double totalBalance = 0;
-  double expenseSoFar = 0;
-  double incomeSoFar = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchAccountsFromDatabase(); // Fetch accounts from Supabase
-  }
-
-  Future<void> _fetchAccountsFromDatabase() async {
-    try {
-      final user = Supabase.instance.client.auth.currentUser;
-
-      if (user != null) {
-        final response = await Supabase.instance.client
-            .from('accounts')
-            .select()
-            .eq('user_id', user.id)
-            .execute();
-
-        if (response.status == 200 && response.data != null) {
-          setState(() {
-            accounts =
-                List<Map<String, dynamic>>.from(response.data.map((account) {
-              return {
-                'type': account['type'],
-                'balance': account['balance'],
-                'ignored': account['ignored'] ?? false,
-              };
-            }));
-            _calculateTotalBalance();
-          });
-        } else {
-          print('Error fetching accounts: ${response.status}');
-        }
-      }
-    } catch (error) {
-      print('Unexpected error: $error');
-    }
-  }
-
-  void _calculateTotalBalance() {
-    totalBalance = accounts.fold(
+    final totalBalance = accounts.fold(
       0.0,
       (sum, account) => sum + (account['balance'] ?? 0.0),
     );
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -93,7 +48,13 @@ class _AccountsPageState extends State<AccountsPage> {
               child: ListView.builder(
                 itemCount: accounts.length,
                 itemBuilder: (context, index) {
-                  return _buildAccountTileWithActions(accounts[index], index);
+                  final account = accounts[index];
+                  return _buildAccountTileWithActions(
+                    context,
+                    accountModel,
+                    account,
+                    index,
+                  );
                 },
               ),
             ),
@@ -102,7 +63,7 @@ class _AccountsPageState extends State<AccountsPage> {
               child: Center(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    _showAddAccountDialog(context);
+                    _showAddAccountDialog(context, accountModel);
                   },
                   icon: const Icon(Icons.add),
                   label: const Text('ADD NEW ACCOUNT'),
@@ -126,7 +87,7 @@ class _AccountsPageState extends State<AccountsPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddEntryPage()),
+            MaterialPageRoute(builder: (context) => const AddEntryPage()),
           );
         },
         backgroundColor: Colors.white,
@@ -135,8 +96,13 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
-  Widget _buildAccountTileWithActions(Map<String, dynamic> account, int index) {
-    bool isIgnored = account['ignored'] ?? false;
+  Widget _buildAccountTileWithActions(
+    BuildContext context,
+    AccountModel accountModel,
+    Map<String, dynamic> account,
+    int index,
+  ) {
+    final isIgnored = account['ignored'] ?? false;
     return Opacity(
       opacity: isIgnored ? 0.5 : 1.0,
       child: Card(
@@ -155,27 +121,23 @@ class _AccountsPageState extends State<AccountsPage> {
             style: const TextStyle(fontSize: 14),
           ),
           trailing: PopupMenuButton<String>(
-            onSelected: (String value) {
+            onSelected: (value) {
               switch (value) {
                 case 'Edit':
-                  _showEditAccountDialog(context, index);
+                  _showEditAccountDialog(context, accountModel, index);
                   break;
                 case 'Delete':
-                  _showDeleteConfirmationDialog(
-                      context, account['type'], index);
+                  accountModel.deleteAccount(index);
                   break;
                 case 'Ignore':
-                  _showIgnoreConfirmationDialog(context, index);
+                  accountModel.toggleIgnore(index);
                   break;
                 case 'Restore':
-                  setState(() {
-                    accounts[index]['ignored'] = false;
-                    _calculateTotalBalance();
-                  });
+                  accountModel.toggleIgnore(index);
                   break;
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
                 value: 'Edit',
                 child: Text('Edit'),
@@ -207,344 +169,31 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
-  void _showAddAccountDialog(BuildContext context) {
+  void _showAddAccountDialog(BuildContext context, AccountModel accountModel) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AddAccountDialog(
-          onSave: (String type, String balance, IconData icon) async {
-            double parsedBalance = double.tryParse(balance) ?? 0.0;
-
-            setState(() {
-              accounts.add({
-                'type': type,
-                'balance': parsedBalance,
-              });
-              _calculateTotalBalance();
-            });
-
-            final user = Supabase.instance.client.auth.currentUser;
-
-            if (user != null) {
-              final response =
-                  await Supabase.instance.client.from('accounts').insert({
-                'type': type,
-                'balance': parsedBalance,
-                'user_id': user.id,
-              }).execute();
-
-              if (response.status != 200) {
-                print('Error adding account: ${response.status}');
-              }
-            }
-          },
-        );
-      },
-    );
-  }
-
-  void _showEditAccountDialog(BuildContext context, int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AddAccountDialog(
-          account: accounts[index],
-          onSave: (String type, String balance, IconData icon) async {
-            double parsedBalance = double.tryParse(balance) ?? 0.0;
-
-            setState(() {
-              accounts[index]['type'] = type;
-              accounts[index]['balance'] = parsedBalance;
-              _calculateTotalBalance();
-            });
-
-            final user = Supabase.instance.client.auth.currentUser;
-
-            if (user != null) {
-              final response = await Supabase.instance.client
-                  .from('accounts')
-                  .update({
-                    'type': type,
-                    'balance': parsedBalance,
-                  })
-                  .eq('id', accounts[index]['id'])
-                  .execute();
-
-              if (response.status != 200) {
-                print('Error updating account: ${response.status}');
-              }
-            }
-          },
-        );
-      },
-    );
-  }
-
-  void _showIgnoreConfirmationDialog(BuildContext context, int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Ignore this account?'),
-          content: const Text(
-              'Unless used, this account will not appear anywhere else. You can restore it at any time.\nAre you sure?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('NO'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  accounts[index]['ignored'] = true;
-                  _calculateTotalBalance();
-                });
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
-              child: const Text('YES'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDeleteConfirmationDialog(
-      BuildContext context, String accountName, int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete this account?'),
-          content: const Text(
-              'Deleting this account will also delete all records with this account. Are you sure?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('NO'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  accounts.removeAt(index);
-                  _calculateTotalBalance();
-                });
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
-              child: const Text('YES'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class AddAccountDialog extends StatefulWidget {
-  final Map<String, dynamic>? account;
-  final Function(String, String, IconData) onSave;
-
-  const AddAccountDialog({this.account, required this.onSave, super.key});
-
-  @override
-  _AddAccountDialogState createState() => _AddAccountDialogState();
-}
-
-class _AddAccountDialogState extends State<AddAccountDialog> {
-  late TextEditingController _nameController;
-  late TextEditingController _amountController;
-  int? _selectedIconIndex;
-
-  final List<IconData> _iconOptions = [
-    Icons.account_balance_wallet,
-    Icons.credit_card,
-    Icons.money,
-    Icons.attach_money,
-    Icons.savings,
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(
-      text: widget.account != null ? widget.account!['type'] : '',
-    );
-    _amountController = TextEditingController(
-      text:
-          widget.account != null ? widget.account!['balance'].toString() : '0',
-    );
-    _selectedIconIndex = 0;
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _amountController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.account != null ? 'Edit Account' : 'Add New Account'),
-      content: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Expanded(
-                  child: Text(
-                    'Initial Amount:',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _amountController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Expanded(
-                  child: Text(
-                    'Name:',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Choose an Icon',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(_iconOptions.length, (index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedIconIndex = index;
-                    });
-                  },
-                  child: Icon(
-                    _iconOptions[index],
-                    size: 40,
-                    color:
-                        _selectedIconIndex == index ? Colors.blue : Colors.grey,
-                  ),
-                );
-              }),
-            ),
-          ],
-        ),
+      builder: (context) => AddAccountDialog(
+        onSave: (type, balance, icon) {
+          accountModel.addAccount(type, double.tryParse(balance) ?? 0.0);
+        },
       ),
-      actions: [
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
-          ),
-          child: const Text('CANCEL'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            widget.onSave(
-              _nameController.text,
-              _amountController.text,
-              _iconOptions[_selectedIconIndex!],
-            );
-            Navigator.pop(context);
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
-          ),
-          child: const Text('SAVE'),
-        ),
-      ],
     );
   }
-}
 
-class AccountDetailsPage extends StatelessWidget {
-  final String accountName;
-  final String balance;
-
-  const AccountDetailsPage({
-    required this.accountName,
-    required this.balance,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text('Account Details'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              accountName,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Account balance: $balance',
-              style: const TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
+  void _showEditAccountDialog(
+    BuildContext context,
+    AccountModel accountModel,
+    int index,
+  ) {
+    final account = accountModel.accounts[index];
+    showDialog(
+      context: context,
+      builder: (context) => AddAccountDialog(
+        account: account,
+        onSave: (type, balance, icon) {
+          accountModel.updateAccount(
+              index, type, double.tryParse(balance) ?? 0.0);
+        },
       ),
     );
   }
