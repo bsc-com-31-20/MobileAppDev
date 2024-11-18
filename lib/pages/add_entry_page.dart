@@ -5,7 +5,9 @@ import 'account_model.dart';
 import 'category_model.dart';
 
 class AddEntryPage extends StatefulWidget {
-  const AddEntryPage({super.key});
+  final Function(String category, double amount)? onExpenseAdded;
+
+  const AddEntryPage({super.key, this.onExpenseAdded});
 
   @override
   _AddEntryPageState createState() => _AddEntryPageState();
@@ -307,6 +309,11 @@ class _AddEntryPageState extends State<AddEntryPage> {
       } else {
         account['balance'] -= enteredAmount;
         accountModel.addExpense(selectedCategory, enteredAmount);
+
+        // Notify BudgetPage about the expense
+        if (widget.onExpenseAdded != null) {
+          widget.onExpenseAdded!(selectedCategory, enteredAmount);
+        }
       }
 
       accountModel.notifyListeners();

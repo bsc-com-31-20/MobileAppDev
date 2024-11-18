@@ -40,6 +40,21 @@ class _BudgetPageState extends State<BudgetPage> {
   double get _totalSpent =>
       _budgetedItems.fold(0.0, (sum, item) => sum + (item['spent'] ?? 0.0));
 
+  // Update the spent amount for a budgeted category
+  void _updateSpentAmount(String category, double spentAmount) {
+    setState(() {
+      final item = _budgetedItems.firstWhere(
+        (item) => item['label'] == category,
+        orElse: () => <String, dynamic>{}, // Return an empty map
+      );
+
+      // Check if the item is not empty before updating
+      if (item.isNotEmpty) {
+        item['spent'] = (item['spent'] ?? 0.0) + spentAmount;
+      }
+    });
+  }
+
   void _changeMonth(bool isNext) {
     final List<String> months = [
       'January',
@@ -324,7 +339,11 @@ class _BudgetPageState extends State<BudgetPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddEntryPage()),
+            MaterialPageRoute(
+              builder: (context) => AddEntryPage(
+                onExpenseAdded: _updateSpentAmount,
+              ),
+            ),
           );
         },
         backgroundColor: Colors.white,
