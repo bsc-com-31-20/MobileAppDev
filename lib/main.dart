@@ -5,7 +5,8 @@ import 'package:flutter_application_1/pages/signup_page.dart';
 import 'pages/onboarding_screen.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
-import 'pages/category_model.dart'; // Import your CategoryModel
+import 'pages/category_model.dart';
+import 'pages/account_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +26,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => CategoryModel(), // Provide CategoryModel to the app
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CategoryModel()),
+        ChangeNotifierProvider(
+            create: (context) => AccountModel()), // Add AccountModel
+      ],
       child: MaterialApp(
         title: 'Student Financial Manager',
         theme: ThemeData(

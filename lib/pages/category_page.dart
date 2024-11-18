@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'category_model.dart'; // Import the shared CategoryModel
+import 'add_entry_page.dart'; // Import the calculator (AddEntryPage)
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -48,13 +49,13 @@ class _CategoryPageState extends State<CategoryPage> {
                     _showAddCategoryDialog(context, categoryModel);
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('ADD NEW CATEGORY'),
+                  label: const Text('Add Category'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     minimumSize: const Size(180, 60),
-                    side: const BorderSide(color: Colors.black),
+                    side: const BorderSide(color: Colors.white),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -64,6 +65,16 @@ class _CategoryPageState extends State<CategoryPage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddEntryPage()),
+          );
+        },
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.add, size: 40),
       ),
     );
   }
