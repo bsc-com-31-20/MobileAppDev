@@ -14,45 +14,26 @@ class _BudgetPageState extends State<BudgetPage> {
   int _selectedIndex = 2;
   String _selectedMonth = 'September 2024';
 
-  final List<Map<String, dynamic>> _budgetedItems = [
-    {
-      'icon': Icons.fastfood,
-      'label': 'Food',
-      'amount': 200000.0,
-      'spent': 50000.0
-    },
-    {
-      'icon': Icons.directions_bus,
-      'label': 'Transportation',
-      'amount': 100000.0,
-      'spent': 25000.0
-    },
-    {
-      'icon': Icons.shopping_bag,
-      'label': 'Clothing',
-      'amount': 150000.0,
-      'spent': 75000.0
-    },
-  ];
+  double get _totalBudget {
+    final categoryModel = Provider.of<CategoryModel>(context, listen: false);
+    return categoryModel.budgetedCategories.fold(
+      0.0,
+      (sum, item) => sum + (item['amount'] ?? 0.0),
+    );
+  }
 
-  double get _totalBudget =>
-      _budgetedItems.fold(0.0, (sum, item) => sum + (item['amount'] ?? 0.0));
-  double get _totalSpent =>
-      _budgetedItems.fold(0.0, (sum, item) => sum + (item['spent'] ?? 0.0));
+  double get _totalSpent {
+    final categoryModel = Provider.of<CategoryModel>(context, listen: false);
+    return categoryModel.budgetedCategories.fold(
+      0.0,
+      (sum, item) => sum + (item['spent'] ?? 0.0),
+    );
+  }
 
   // Update the spent amount for a budgeted category
   void _updateSpentAmount(String category, double spentAmount) {
-    setState(() {
-      final item = _budgetedItems.firstWhere(
-        (item) => item['label'] == category,
-        orElse: () => <String, dynamic>{}, // Return an empty map
-      );
-
-      // Check if the item is not empty before updating
-      if (item.isNotEmpty) {
-        item['spent'] = (item['spent'] ?? 0.0) + spentAmount;
-      }
-    });
+    final categoryModel = Provider.of<CategoryModel>(context, listen: false);
+    categoryModel.updateSpentAmount(category, spentAmount);
   }
 
   void _changeMonth(bool isNext) {
@@ -117,18 +98,21 @@ class _BudgetPageState extends State<BudgetPage> {
             ),
             TextButton(
               onPressed: () {
-                setState(() {
-                  if (isNew) {
-                    _budgetedItems.add({
-                      'icon': item['icon'],
-                      'label': item['name'],
-                      'amount': double.parse(amountController.text),
-                      'spent': 0.0,
-                    });
-                  } else {
-                    item['amount'] = double.parse(amountController.text);
-                  }
-                });
+                final categoryModel =
+                    Provider.of<CategoryModel>(context, listen: false);
+                if (isNew) {
+                  categoryModel.addBudgetedCategory({
+                    'icon': item['icon'],
+                    'label': item['name'],
+                    'amount': double.parse(amountController.text),
+                    'spent': 0.0,
+                  });
+                } else {
+                  categoryModel.updateBudgetLimit(
+                    item['label'],
+                    double.parse(amountController.text),
+                  );
+                }
                 Navigator.pop(context);
               },
               child: const Text('SAVE'),
@@ -155,9 +139,9 @@ class _BudgetPageState extends State<BudgetPage> {
             ),
             TextButton(
               onPressed: () {
-                setState(() {
-                  _budgetedItems.remove(item);
-                });
+                final categoryModel =
+                    Provider.of<CategoryModel>(context, listen: false);
+                categoryModel.removeBudgetedCategory(item['label']);
                 Navigator.pop(context);
               },
               child: const Text('REMOVE'),
@@ -171,9 +155,10 @@ class _BudgetPageState extends State<BudgetPage> {
   @override
   Widget build(BuildContext context) {
     final categoryModel = Provider.of<CategoryModel>(context);
+    final budgetedItems = categoryModel.budgetedCategories;
     final notBudgetedItems = categoryModel.expenseCategories
         .where((category) =>
-            !_budgetedItems.any((item) => item['label'] == category['name']))
+            !budgetedItems.any((item) => item['label'] == category['name']))
         .toList();
 
     return Scaffold(
@@ -192,7 +177,7 @@ class _BudgetPageState extends State<BudgetPage> {
               _selectedMonth,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -218,14 +203,16 @@ class _BudgetPageState extends State<BudgetPage> {
                     children: [
                       const Text(
                         'TOTAL BUDGET',
-                        style: TextStyle(color: Colors.black, fontSize: 14,fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
                       ),
                       Text(
                         'MK${_totalBudget.toStringAsFixed(2)}',
                         style: const TextStyle(
                           color: Colors.green,
                           fontSize: 16,
-                          
                         ),
                       ),
                     ],
@@ -235,14 +222,16 @@ class _BudgetPageState extends State<BudgetPage> {
                     children: [
                       const Text(
                         'TOTAL SPENT',
-                        style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
                       ),
                       Text(
                         'MK${_totalSpent.toStringAsFixed(2)}',
                         style: const TextStyle(
                           color: Colors.red,
                           fontSize: 16,
-                
                         ),
                       ),
                     ],
@@ -261,7 +250,7 @@ class _BudgetPageState extends State<BudgetPage> {
               ),
               const SizedBox(height: 10),
               Column(
-                children: _budgetedItems.map((item) {
+                children: budgetedItems.map((item) {
                   double remaining =
                       (item['amount'] ?? 0.0) - (item['spent'] ?? 0.0);
                   return ListTile(

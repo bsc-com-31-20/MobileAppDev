@@ -281,7 +281,6 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       content: SingleChildScrollView(
         child: Column(
           children: [
-            // Category Type Selection
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -321,8 +320,6 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Category Name Input
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
@@ -331,8 +328,6 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Icon Selection
             const Text('Choose an Icon',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),

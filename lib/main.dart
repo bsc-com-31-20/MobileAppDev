@@ -11,7 +11,7 @@ import 'pages/account_model.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
- //to be changed
+  // Initialize Supabase
   await Supabase.initialize(
     url: 'https://ceembasvhajkbzmdfpmn.supabase.co',
     anonKey:
@@ -28,9 +28,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => CategoryModel()),
         ChangeNotifierProvider(
-            create: (context) => AccountModel()), // Add AccountModel
+          create: (context) =>
+              CategoryModel(supabaseClient: Supabase.instance.client),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AccountModel(
+              supabaseClient:
+                  Supabase.instance.client), // Pass Supabase client here
+        ),
       ],
       child: MaterialApp(
         title: 'Student Financial Manager',

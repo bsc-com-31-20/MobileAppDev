@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'add_entry_page.dart'; // Correctly retained import
+import 'add_entry_page.dart';
 import 'account_model.dart';
 import 'add_account_dialog.dart';
 import 'account_details_page.dart';
@@ -27,11 +27,11 @@ class AccountsPage extends StatelessWidget {
         title: Column(
           children: [
             Text(
-              '[All Accounts MK$totalBalance]',
+              'All Accounts MK$totalBalance',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontSize: 24,
               ),
             ),
             const SizedBox(height: 10),
@@ -70,7 +70,8 @@ class AccountsPage extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: const Color.fromARGB(255, 255, 253, 253),
-                    padding: const EdgeInsets.symmetric(horizontal: 29.0,vertical: 15.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 29.0, vertical: 15.0),
                     minimumSize: const Size(180, 60),
                     side: const BorderSide(color: Colors.white),
                     shape: RoundedRectangleBorder(

@@ -105,7 +105,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
               _getFormattedMonth(),
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -237,15 +237,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
   Widget _buildCategoryLabels() {
     // Determine data based on the selected overview type
     final data = _overviewType.contains('Expense') ? _expenseData : _incomeData;
-
-    if (data.isEmpty) {
-      return const Center(
-        child: Text(
-          'No categories to display.',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-      );
-    }
 
     // Generate a list of category labels with corresponding colors
     final categoryWidgets = data.entries.map((entry) {
