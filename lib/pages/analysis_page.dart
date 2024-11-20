@@ -195,7 +195,12 @@ class _AnalysisPageState extends State<AnalysisPage> {
       return Center(
         child: Text(
           'No $type Data Available',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.normal, // No bold
+            color: Colors.grey[600] ??
+                Colors.grey, // Fallback to default grey if null
+          ),
         ),
       );
     }

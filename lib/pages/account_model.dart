@@ -64,7 +64,7 @@ class AccountModel with ChangeNotifier {
       await supabaseClient.from('accounts').insert({
         'type': type,
         'balance': balance,
-        'ignored': false,
+        'deactivated': false,
         'user_id': userId, // Include user_id
       }).execute();
 
@@ -111,12 +111,12 @@ class AccountModel with ChangeNotifier {
   Future<void> toggleIgnore(int index) async {
     if (index >= 0 && index < _accounts.length) {
       final id = _accounts[index]['id'];
-      final currentState = _accounts[index]['ignored'];
+      final currentState = _accounts[index]['deactivated'];
 
       try {
         await supabaseClient
             .from('accounts')
-            .update({'ignored': !currentState})
+            .update({'deactivated': !currentState})
             .eq('id', id)
             .execute();
 

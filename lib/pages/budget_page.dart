@@ -11,8 +11,7 @@ class BudgetPage extends StatefulWidget {
 }
 
 class _BudgetPageState extends State<BudgetPage> {
-  int _selectedIndex = 2;
-  String _selectedMonth = 'September 2024';
+  String _selectedMonth = 'November 2024';
 
   double get _totalBudget {
     final categoryModel = Provider.of<CategoryModel>(context, listen: false);
@@ -30,7 +29,6 @@ class _BudgetPageState extends State<BudgetPage> {
     );
   }
 
-  // Update the spent amount for a budgeted category
   void _updateSpentAmount(String category, double spentAmount) {
     final categoryModel = Provider.of<CategoryModel>(context, listen: false);
     categoryModel.updateSpentAmount(category, spentAmount);
@@ -75,7 +73,6 @@ class _BudgetPageState extends State<BudgetPage> {
     setState(() {});
   }
 
-  // Show dialog to set or change budget
   void _showBudgetDialog(Map<String, dynamic> item, {bool isNew = false}) {
     TextEditingController amountController = TextEditingController(
       text: isNew ? '' : item['amount'].toString(),
@@ -123,7 +120,6 @@ class _BudgetPageState extends State<BudgetPage> {
     );
   }
 
-  // Show confirmation dialog to remove budget
   void _showRemoveConfirmationDialog(Map<String, dynamic> item) {
     showDialog(
       context: context,
@@ -194,7 +190,6 @@ class _BudgetPageState extends State<BudgetPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Total Budget and Total Spent
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -239,8 +234,6 @@ class _BudgetPageState extends State<BudgetPage> {
                 ],
               ),
               const SizedBox(height: 20),
-
-              // Budgeted items
               Text(
                 'Budgeted items:',
                 style: const TextStyle(
@@ -249,77 +242,92 @@ class _BudgetPageState extends State<BudgetPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              Column(
-                children: budgetedItems.map((item) {
-                  double remaining =
-                      (item['amount'] ?? 0.0) - (item['spent'] ?? 0.0);
-                  return ListTile(
-                    leading: Icon(item['icon'] ?? Icons.category, size: 40),
-                    title: Text(item['label'] ?? 'Unnamed',
-                        style: const TextStyle(fontSize: 16)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Limit: MK${item['amount']}'),
-                        Text('Spent: MK${item['spent']}'),
-                        Text('Remaining: MK$remaining'),
-                        LinearProgressIndicator(
-                          value:
-                              item['spent'] / (item['amount'] as double? ?? 1),
-                          color: Colors.red,
-                          backgroundColor: Colors.grey[200],
-                        ),
-                      ],
+              budgetedItems.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'Currently, no budget is applied for this month. Set budget-limits for this month.',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    )
+                  : Column(
+                      children: budgetedItems.map((item) {
+                        double remaining =
+                            (item['amount'] ?? 0.0) - (item['spent'] ?? 0.0);
+                        return ListTile(
+                          leading:
+                              Icon(item['icon'] ?? Icons.category, size: 40),
+                          title: Text(item['label'] ?? 'Unnamed',
+                              style: const TextStyle(fontSize: 16)),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Limit: MK${item['amount']}'),
+                              Text('Spent: MK${item['spent']}'),
+                              Text('Remaining: MK$remaining'),
+                              LinearProgressIndicator(
+                                value: item['spent'] /
+                                    (item['amount'] as double? ?? 1),
+                                color: Colors.red,
+                                backgroundColor: Colors.grey[200],
+                              ),
+                            ],
+                          ),
+                          trailing: PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_horiz),
+                            onSelected: (value) {
+                              if (value == 'change') {
+                                _showBudgetDialog(item);
+                              } else if (value == 'remove') {
+                                _showRemoveConfirmationDialog(item);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                  value: 'change', child: Text('Change Limit')),
+                              const PopupMenuItem(
+                                  value: 'remove',
+                                  child: Text('Remove Budget')),
+                            ],
+                          ),
+                        );
+                      }).toList(),
                     ),
-                    trailing: PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_horiz),
-                      onSelected: (value) {
-                        if (value == 'change') {
-                          _showBudgetDialog(item);
-                        } else if (value == 'remove') {
-                          _showRemoveConfirmationDialog(item);
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                            value: 'change', child: Text('Change Limit')),
-                        const PopupMenuItem(
-                            value: 'remove', child: Text('Remove Budget')),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
               const SizedBox(height: 30),
-
-              // Not Budgeted Items
               const Text(
                 'Not budgeted items:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              Column(
-                children: notBudgetedItems.map((item) {
-                  return ListTile(
-                    leading: Icon(item['icon'] ?? Icons.category, size: 40),
-                    title: Text(item['name'] ?? 'Unnamed',
-                        style: const TextStyle(fontSize: 16)),
-                    trailing: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.black),
+              notBudgetedItems.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No category found. Add categories in order to apply budget.',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
-                      onPressed: () {
-                        _showBudgetDialog(item, isNew: true);
-                      },
-                      child: const Text(
-                        'SET BUDGET',
-                        style: TextStyle(color: Colors.black),
-                      ),
+                    )
+                  : Column(
+                      children: notBudgetedItems.map((item) {
+                        return ListTile(
+                          leading:
+                              Icon(item['icon'] ?? Icons.category, size: 40),
+                          title: Text(item['name'] ?? 'Unnamed',
+                              style: const TextStyle(fontSize: 16)),
+                          trailing: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: const BorderSide(color: Colors.black),
+                            ),
+                            onPressed: () {
+                              _showBudgetDialog(item, isNew: true);
+                            },
+                            child: const Text(
+                              'SET BUDGET',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
-                  );
-                }).toList(),
-              ),
             ],
           ),
         ),
