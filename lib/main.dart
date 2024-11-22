@@ -33,9 +33,8 @@ class MyApp extends StatelessWidget {
               CategoryModel(supabaseClient: Supabase.instance.client),
         ),
         ChangeNotifierProvider(
-          create: (context) => AccountModel(
-              supabaseClient:
-                  Supabase.instance.client), // Pass Supabase client here
+          create: (context) =>
+              AccountModel(supabaseClient: Supabase.instance.client),
         ),
       ],
       child: MaterialApp(
