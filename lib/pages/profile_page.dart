@@ -86,7 +86,7 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
+                MaterialPageRoute(builder: (context) => const UpdateProfilePage()),
               );
             },
           )
@@ -128,7 +128,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 20),
 
-            // Financial Summary (E.g., Total balance and income)
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               elevation: 5,
@@ -228,11 +227,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   ListTile(
                     leading: const Icon(FontAwesomeIcons.cogs),
                     title: const Text('Settings'),
-                    trailing: const Icon(Icons.arrow_forward_ios),
+                    trailing: const Icon(Icons.arrow_forward_ios,),
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SettingsPage()),
+                        MaterialPageRoute(builder: (context) => const UpdateProfilePage()),
                       );
                     },
                   ),

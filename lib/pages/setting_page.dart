@@ -2,48 +2,127 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+class UpdateProfilePage extends StatefulWidget {
+  const UpdateProfilePage({super.key});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  _UpdateProfilePageState createState() => _UpdateProfilePageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
-  // Controllers for text fields
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
+class _UpdateProfilePageState extends State<UpdateProfilePage> {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
 
-  // Placeholder for profile image (initially a network image)
   String _profileImageUrl = 'https://example.com/user-profile.jpg';
-  
-  bool _isSaving = false; // Show saving indicator when saving profile
+  bool _isSaving = false;
 
-  // Function to pick a new image
+  final SupabaseClient supabase = Supabase.instance.client;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final user = supabase.auth.currentUser;
+    if (user != null) {
+      setState(() {
+        _nameController.text = user.userMetadata?['display_name'] ?? '';
+        _emailController.text = user.email ?? '';
+        _phoneController.text = user.userMetadata?['phone'] ?? '';
+        _profileImageUrl = user.userMetadata?['profile_image_url'] ??
+            'https://example.com/user-profile.jpg';
+      });
+    }
+  }
+
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       setState(() {
-        // Update the profile image with the new image path
         _profileImageUrl = image.path;
+      });
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    final String name = _nameController.text.trim();
+    final String email = _emailController.text.trim();
+    final String phone = _phoneController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    try {
+      setState(() {
+        _isSaving = true;
+      });
+
+      String? uploadedImageUrl;
+      if (!_profileImageUrl.contains('http')) {
+        final file = File(_profileImageUrl);
+        final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+        final storageResponse = await supabase.storage
+            .from('images') 
+            .upload(fileName, file);
+
+        if (storageResponse.error != null) {
+          throw Exception('Image upload failed: ${storageResponse.error!.message}');
+        }
+
+        uploadedImageUrl = supabase.storage
+            .from('images')
+            .getPublicUrl(fileName)
+            .data;
+      }
+
+      final user = supabase.auth.currentUser;
+      if (user != null) {
+       
+        final updateResponse = await supabase.auth.updateUser(UserAttributes(
+          email: email, 
+          data: {
+            'display_name': name,
+            'phone': phone,
+            'profile_image_url': uploadedImageUrl ?? _profileImageUrl,
+          },
+        ));
+
+        if (updateResponse.error != null) {
+          throw Exception('Profile update failed: ${updateResponse.error!.message}');
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully!')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isSaving = false;
       });
     }
   }
 
   @override
   void dispose() {
-    // Dispose controllers when the widget is destroyed
-    _firstNameController.dispose();
-    _lastNameController.dispose();
+    _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
@@ -51,19 +130,18 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Profile', style: TextStyle(color: Colors.white),),
         centerTitle: true,
+        title: const Text('Update Profile', style: TextStyle(color: Colors.white, fontWeight:FontWeight.bold  ),),
         backgroundColor: Colors.blueAccent,
-        
       ),
       body: _isSaving
-          ? const Center(child: CircularProgressIndicator()) // Show progress when saving
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(20.0),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // Profile Picture
+                   
                     Stack(
                       children: [
                         CircleAvatar(
@@ -73,7 +151,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             radius: 55,
                             backgroundImage: _profileImageUrl.contains('http')
                                 ? CachedNetworkImageProvider(_profileImageUrl)
-                                : FileImage(File(_profileImageUrl)) as ImageProvider,
+                                : FileImage(File(_profileImageUrl))
+                                    as ImageProvider,
                           ),
                         ),
                         Positioned(
@@ -88,23 +167,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // First Name Field
                     _buildInputField(
-                      controller: _firstNameController,
-                      label: 'First Name',
+                      controller: _nameController,
+                      label: 'Name',
                       icon: Icons.person,
                     ),
                     const SizedBox(height: 20),
 
-                    // Last Name Field
-                    _buildInputField(
-                      controller: _lastNameController,
-                      label: 'Last Name',
-                      icon: Icons.person_outline,
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Email Field
                     _buildInputField(
                       controller: _emailController,
                       label: 'Email Address',
@@ -113,42 +182,29 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Phone Number Field
                     _buildInputField(
                       controller: _phoneController,
-                      label: 'Phone Number',
+                      label: 'Mobile Phone Number',
                       icon: Icons.phone,
                       keyboardType: TextInputType.phone,
                     ),
-                    const SizedBox(height: 20),
-
-                    // Password Field
-                    _buildInputField(
-                      controller: _passwordController,
-                      label: 'Password',
-                      icon: Icons.lock,
-                      isObscure: true,
-                    ),
                     const SizedBox(height: 30),
 
-                    // Save Changes Button
                     ElevatedButton(
-                      onPressed: () {
-                        _saveProfile();
-                      },
+                      onPressed: _isSaving ? null : _saveProfile,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:Colors.blueAccent,
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        backgroundColor: Colors.blueAccent,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 50,
+                          vertical: 15,
+                        ),
                         shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: const Text(
                         'Save Changes',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white
-                          ),
+                        style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
                     ),
                   ],
@@ -162,12 +218,10 @@ class _SettingsPageState extends State<SettingsPage> {
     required TextEditingController controller,
     required String label,
     required IconData icon,
-    bool isObscure = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
     return TextFormField(
       controller: controller,
-      obscureText: isObscure,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
@@ -180,35 +234,14 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+}
 
-  void _saveProfile() {
-    String firstName = _firstNameController.text;
-    String lastName = _lastNameController.text;
-    String email = _emailController.text;
-    String phone = _phoneController.text;
-     //String password = _passwordController.text;
+extension on String {
+  String? get data => null;
+  
+  get error => null;
+}
 
-    // Perform validations (if necessary) and then save the new profile data
-    if (firstName.isNotEmpty && lastName.isNotEmpty && email.isNotEmpty && phone.isNotEmpty) {
-      setState(() {
-        _isSaving = true;
-      });
-
-      // Simulate saving process (e.g., sending to backend)
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          _isSaving = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')),
-        );
-      });
-    } else {
-      // Show error message if fields are empty
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
-    }
-  }
+extension on UserResponse {
+  get error => null;
 }
