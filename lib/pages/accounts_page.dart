@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'add_entry_page.dart'; // Correctly retained import
+import 'add_entry_page.dart';
 import 'account_model.dart';
 import 'add_account_dialog.dart';
 import 'account_details_page.dart';
@@ -27,11 +27,11 @@ class AccountsPage extends StatelessWidget {
         title: Column(
           children: [
             Text(
-              '[All Accounts MK$totalBalance]',
+              'All Accounts MK$totalBalance',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontSize: 24,
               ),
             ),
             const SizedBox(height: 10),
@@ -44,20 +44,31 @@ class AccountsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: accounts.length,
-                itemBuilder: (context, index) {
-                  final account = accounts[index];
-                  return _buildAccountTileWithActions(
-                    context,
-                    accountModel,
-                    account,
-                    index,
-                  );
-                },
+            if (accounts.isEmpty)
+              const Center(
+                child: Text(
+                  "You don't have any accounts yet. Please add a new account.",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.grey,
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                child: ListView.builder(
+                  itemCount: accounts.length,
+                  itemBuilder: (context, index) {
+                    final account = accounts[index];
+                    return _buildAccountTileWithActions(
+                      context,
+                      accountModel,
+                      account,
+                      index,
+                    );
+                  },
+                ),
               ),
-            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: Center(
@@ -66,11 +77,12 @@ class AccountsPage extends StatelessWidget {
                     _showAddAccountDialog(context, accountModel);
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Account'),
+                  label: const Text('ADD NEW ACCOUNT'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: const Color.fromARGB(255, 255, 253, 253),
-                    padding: const EdgeInsets.symmetric(horizontal: 29.0,vertical: 15.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 29.0, vertical: 15.0),
                     minimumSize: const Size(180, 60),
                     side: const BorderSide(color: Colors.white),
                     shape: RoundedRectangleBorder(
@@ -102,7 +114,7 @@ class AccountsPage extends StatelessWidget {
     Map<String, dynamic> account,
     int index,
   ) {
-    final isIgnored = account['ignored'] ?? false;
+    final isIgnored = account['deactivated'] ?? false;
     return Opacity(
       opacity: isIgnored ? 0.5 : 1.0,
       child: Card(
@@ -127,12 +139,12 @@ class AccountsPage extends StatelessWidget {
                   _showEditAccountDialog(context, accountModel, index);
                   break;
                 case 'Delete':
-                  accountModel.deleteAccount(index);
+                  _showDeleteAccountConfirmation(context, accountModel, index);
                   break;
-                case 'Ignore':
+                case 'Deactivate':
                   accountModel.toggleIgnore(index);
                   break;
-                case 'Restore':
+                case 'Activate':
                   accountModel.toggleIgnore(index);
                   break;
               }
@@ -147,8 +159,8 @@ class AccountsPage extends StatelessWidget {
                 child: Text('Delete'),
               ),
               PopupMenuItem<String>(
-                value: isIgnored ? 'Restore' : 'Ignore',
-                child: Text(isIgnored ? 'Restore' : 'Ignore'),
+                value: isIgnored ? 'Activate' : 'Deactivate',
+                child: Text(isIgnored ? 'Activate' : 'Deactivate'),
               ),
             ],
             icon: const Icon(Icons.more_horiz),
@@ -194,6 +206,40 @@ class AccountsPage extends StatelessWidget {
           accountModel.updateAccount(
               index, type, double.tryParse(balance) ?? 0.0);
         },
+      ),
+    );
+  }
+
+  void _showDeleteAccountConfirmation(
+    BuildContext context,
+    AccountModel accountModel,
+    int index,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete this account?'),
+        content: const Text(
+          'Deleting this account will also delete all records with this account. Are you sure?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('NO'),
+          ),
+          TextButton(
+            onPressed: () {
+              accountModel.deleteAccount(index);
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('YES'),
+          ),
+        ],
       ),
     );
   }

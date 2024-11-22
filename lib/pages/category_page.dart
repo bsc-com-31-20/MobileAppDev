@@ -35,12 +35,14 @@ class _CategoryPageState extends State<CategoryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildCategorySection(
-                'Income Categories',
+                'Income Categories:',
                 categoryModel.incomeCategories,
+                'You don\'t have any income category yet. Please add a new income category.',
               ),
               _buildCategorySection(
-                'Expense Categories',
+                'Expense Categories:',
                 categoryModel.expenseCategories,
+                'You don\'t have any expense category yet. Please add a new expense category.',
               ),
               const SizedBox(height: 16),
               Center(
@@ -49,7 +51,7 @@ class _CategoryPageState extends State<CategoryPage> {
                     _showAddCategoryDialog(context, categoryModel);
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Category'),
+                  label: const Text('ADD NEW CATEGORY'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
@@ -82,6 +84,7 @@ class _CategoryPageState extends State<CategoryPage> {
   Widget _buildCategorySection(
     String title,
     List<Map<String, dynamic>> categories,
+    String noCategoryMessage,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,10 +96,17 @@ class _CategoryPageState extends State<CategoryPage> {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              decoration: TextDecoration.underline,
             ),
           ),
         ),
+        if (categories.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              noCategoryMessage,
+              style: TextStyle(color: Colors.grey[600], fontSize: 18),
+            ),
+          ),
         ...categories.map((category) {
           return _buildCategoryTileWithActions(category);
         }),
@@ -105,7 +115,7 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildCategoryTileWithActions(Map<String, dynamic> category) {
-    bool isIgnored = category['ignored'] ?? false;
+    bool isIgnored = category['deactivate'] ?? false;
     return Opacity(
       opacity: isIgnored ? 0.5 : 1.0,
       child: Card(
@@ -128,14 +138,14 @@ class _CategoryPageState extends State<CategoryPage> {
                 case 'Delete':
                   _showDeleteConfirmationDialog(context, category['name']);
                   break;
-                case 'Ignore':
+                case 'Deactivate':
                   setState(() {
-                    category['ignored'] = true;
+                    category['deactivate'] = true;
                   });
                   break;
-                case 'Restore':
+                case 'Activate':
                   setState(() {
-                    category['ignored'] = false;
+                    category['deactivate'] = false;
                   });
                   break;
               }
@@ -150,8 +160,8 @@ class _CategoryPageState extends State<CategoryPage> {
                 child: Text('Delete'),
               ),
               PopupMenuItem<String>(
-                value: isIgnored ? 'Restore' : 'Ignore',
-                child: Text(isIgnored ? 'Restore' : 'Ignore'),
+                value: isIgnored ? 'Activate' : 'Deactivate',
+                child: Text(isIgnored ? 'Activate' : 'Deactivate'),
               ),
             ],
             icon: const Icon(Icons.more_horiz),
@@ -209,13 +219,15 @@ class _CategoryPageState extends State<CategoryPage> {
               },
               child: const Text('NO'),
             ),
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 Provider.of<CategoryModel>(context, listen: false)
                     .removeCategory(categoryName);
                 Navigator.pop(context);
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
               child: const Text('YES'),
             ),
           ],
@@ -281,7 +293,6 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       content: SingleChildScrollView(
         child: Column(
           children: [
-            // Category Type Selection
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -321,8 +332,6 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Category Name Input
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
@@ -331,8 +340,6 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Icon Selection
             const Text('Choose an Icon',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
