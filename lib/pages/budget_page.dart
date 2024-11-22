@@ -236,7 +236,7 @@ class _BudgetPageState extends State<BudgetPage> {
               const SizedBox(height: 20),
               Text(
                 'Budgeted items:',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
