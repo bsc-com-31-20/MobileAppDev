@@ -31,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
         setState(() {
-           displayName = user.userMetadata?['display_name'] ?? 'No Name';
+          displayName = user.userMetadata?['display_name'] ?? 'No Name';
           email = user.email ?? 'No Email';
         });
       }
@@ -69,14 +69,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        
         title: const Text(
           'Profile',
           style: TextStyle(
-                fontWeight:FontWeight.bold,
-                fontSize: 24, 
-                color: Colors.white
-              ),
+              fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
         ),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
@@ -86,7 +82,8 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const UpdateProfilePage()),
+                MaterialPageRoute(
+                    builder: (context) => const UpdateProfilePage()),
               );
             },
           )
@@ -195,25 +192,23 @@ class _ProfilePageState extends State<ProfilePage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                       MaterialPageRoute(builder: (context) => const AnalysisPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const AnalysisPage()),
                       );
-
                     },
                   ),
                   const Divider(),
                   ListTile(
-                    leading: const Icon(FontAwesomeIcons.creditCard),
-                    title: const Text('Manage Accounts'),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                       MaterialPageRoute(builder: (context) => const AccountsPage()),
-                      );
-
-                    }
-                      
-                  ),
+                      leading: const Icon(FontAwesomeIcons.creditCard),
+                      title: const Text('Manage Accounts'),
+                      trailing: const Icon(Icons.arrow_forward_ios),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AccountsPage()),
+                        );
+                      }),
                   const Divider(),
                   ListTile(
                     leading: const Icon(FontAwesomeIcons.piggyBank),
@@ -227,11 +222,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   ListTile(
                     leading: const Icon(FontAwesomeIcons.cogs),
                     title: const Text('Settings'),
-                    trailing: const Icon(Icons.arrow_forward_ios,),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const UpdateProfilePage()),
+                        MaterialPageRoute(
+                            builder: (context) => const UpdateProfilePage()),
                       );
                     },
                   ),
