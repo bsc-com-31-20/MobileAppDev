@@ -1,148 +1,151 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'account_model.dart';
+import 'category_model.dart';
 
 class AddEntryPage extends StatefulWidget {
-  const AddEntryPage({super.key});
+  final Function(String category, double amount)? onExpenseAdded;
+
+  const AddEntryPage({super.key, this.onExpenseAdded});
 
   @override
   _AddEntryPageState createState() => _AddEntryPageState();
 }
 
 class _AddEntryPageState extends State<AddEntryPage> {
-  bool isIncome = true;
-  String selectedAccount = 'Airtel Money';
-  String selectedCategory = 'Food';
-  String amount = '';
-
-  final List<String> accounts = ['Airtel Money', 'Bank Transfer', 'Cash'];
-  final List<String> categories = ['Food', 'Transport', 'Entertainment', 'Utilities'];
+  bool isIncome = false;
+  String selectedAccount = 'Account';
+  String selectedCategory = 'Category';
+  String amount = '0';
 
   @override
   Widget build(BuildContext context) {
+    final accountModel = Provider.of<AccountModel>(context);
+    final categoryModel = Provider.of<CategoryModel>(context);
+
+    final incomeCategories = categoryModel.incomeCategories;
+    final expenseCategories = categoryModel.expenseCategories;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Add Entry',
-          style: TextStyle(fontSize: 20, color: Colors.black),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.cancel, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.close, color: Colors.teal),
+              label: const Text('CANCEL', style: TextStyle(color: Colors.teal)),
+            ),
+            TextButton.icon(
+              onPressed: _saveEntry,
+              icon: const Icon(Icons.check, color: Colors.teal),
+              label: const Text('SAVE', style: TextStyle(color: Colors.teal)),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save, color: Colors.black),
-            onPressed: () {
-              // Handle save action
-            },
-          ),
-        ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isIncome ? Colors.green : Colors.grey,
-                  ),
+                TextButton(
                   onPressed: () {
                     setState(() {
                       isIncome = true;
                     });
                   },
-                  child: const Text('Income'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: !isIncome ? Colors.red : Colors.grey,
+                  child: Text(
+                    'INCOME',
+                    style: TextStyle(
+                      color: isIncome ? Colors.teal : Colors.grey,
+                      fontWeight:
+                          isIncome ? FontWeight.bold : FontWeight.normal,
+                    ),
                   ),
+                ),
+                const Text('|', style: TextStyle(color: Colors.grey)),
+                TextButton(
                   onPressed: () {
                     setState(() {
                       isIncome = false;
                     });
                   },
-                  child: const Text('Expenses'),
+                  child: Text(
+                    'EXPENSE',
+                    style: TextStyle(
+                      color: !isIncome ? Colors.teal : Colors.grey,
+                      fontWeight:
+                          !isIncome ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
-            // Account and Category selection
-            DropdownButton<String>(
-              value: selectedAccount,
-              items: accounts.map((String account) {
-                return DropdownMenuItem<String>(
-                  value: account,
-                  child: Text(account),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedAccount = newValue!;
-                });
-              },
-            ),
-            const SizedBox(height: 10),
-            DropdownButton<String>(
-              value: selectedCategory,
-              items: categories.map((String category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
-              onChanged: isIncome ? null : (String? newValue) { // Disable if income
-                setState(() {
-                  selectedCategory = newValue!;
-                });
-              },
+            // Account and Category Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildButtonWithIcon(
+                  Icons.account_balance_wallet,
+                  selectedAccount,
+                  () => _showAccountSelector(context, accountModel.accounts),
+                ),
+                _buildButtonWithIcon(
+                  Icons.category,
+                  selectedCategory,
+                  () => _showCategorySelector(
+                    context,
+                    isIncome ? incomeCategories : expenseCategories,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
 
-            // Text input for amount
-            TextField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Amount',
+            // Amount Display
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
               ),
-              controller: TextEditingController(text: amount),
-              readOnly: true,
-            ),
-            const SizedBox(height: 20),
-
-            // Calculator/Amount Input
-            _buildCalculator(),
-            const SizedBox(height: 20),
-
-            // Date and Time Display
-            Text(
-              DateFormat('MMM dd, yyyy').format(DateTime.now()),
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              DateFormat('hh:mm a').format(DateTime.now()),
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 30),
-
-            // Remove Ads
-            const Text(
-              'Remove Ads - MK3,500',
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 16,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    amount,
+                    style: const TextStyle(fontSize: 36),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.backspace_outlined,
+                        color: Colors.grey),
+                    onPressed: () {
+                      setState(() {
+                        if (amount.isNotEmpty) {
+                          amount = amount.length > 1
+                              ? amount.substring(0, amount.length - 1)
+                              : '0';
+                        }
+                      });
+                    },
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(height: 20),
+
+            Expanded(
+              child: _buildCalculator(),
             ),
           ],
         ),
@@ -150,56 +153,180 @@ class _AddEntryPageState extends State<AddEntryPage> {
     );
   }
 
-  // Widget for calculator layout
-  Widget _buildCalculator() {
-    return GridView.count(
-      shrinkWrap: true,
-      crossAxisCount: 4,
-      childAspectRatio: 1.5,
-      children:
-          List.generate(12, (index) {
-        String buttonText;
-        if (index < 9) {
-          buttonText = '${index + 1}';
-        } else if (index == 9) {
-          buttonText = '0';
-        } else if (index == 10) {
-          buttonText = '+';
-        } else {
-          buttonText = 'x'; // Change "-" to "x"
-        }
+  Widget _buildButtonWithIcon(IconData icon, String label, VoidCallback onTap) {
+    return ElevatedButton.icon(
+      icon: Icon(icon, color: Colors.teal),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.grey.shade200,
+        foregroundColor: Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      onPressed: onTap,
+    );
+  }
 
+  Widget _buildCalculator() {
+    const buttonLabels = [
+      '+',
+      '7',
+      '8',
+      '9',
+      '-',
+      '4',
+      '5',
+      '6',
+      '×',
+      '1',
+      '2',
+      '3',
+      '÷',
+      '0',
+      '.',
+      '='
+    ];
+    return GridView.builder(
+      shrinkWrap: true,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        childAspectRatio: 1.5,
+      ),
+      itemCount: buttonLabels.length,
+      itemBuilder: (context, index) {
+        final label = buttonLabels[index];
         return InkWell(
           onTap: () {
             setState(() {
-              if (buttonText == '+') {
-                // Handle addition logic if needed
-              } else if (buttonText == 'x') { // Delete last character
-                if (amount.isNotEmpty) {
-                  amount = amount.substring(0, amount.length - 1);
-                }
+              if (label == '=') {
+                // Calculation logic
+              } else if (['+', '-', '×', '÷'].contains(label)) {
+                // Operator logic
               } else {
-                amount += buttonText; // Append number to the amount
+                amount = (amount == '0') ? label : amount + label;
               }
             });
           },
-          child:
-           Card(
-             color:
-               index == 10 ? Colors.blueAccent : index == 11 ? Colors.redAccent : null, // Color for operators
-             child:
-               Center(
-                 child:
-                   Text(
-                     buttonText,
-                     style:
-                       const TextStyle(fontSize:
-                         24),
-                   ),
-               ),
-           ),
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 24,
+                  color: ['+', '-', '×', '÷'].contains(label)
+                      ? Colors.teal
+                      : Colors.black,
+                ),
+              ),
+            ),
+          ),
         );
-      }),
+      },
     );
+  }
+
+  void _showAccountSelector(
+      BuildContext context, List<Map<String, dynamic>> accounts) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ListView(
+          children: [
+            ListTile(
+              title: const Text('Select an Account'),
+            ),
+            ...accounts.map((account) {
+              return ListTile(
+                leading: const Icon(Icons.account_balance_wallet),
+                title: Text(account['type']),
+                subtitle: Text('Balance: ${account['balance']}'),
+                onTap: () {
+                  setState(() {
+                    selectedAccount = account['type'];
+                  });
+                  Navigator.pop(context);
+                },
+              );
+            }).toList(),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCategorySelector(
+      BuildContext context, List<Map<String, dynamic>> categories) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return GridView.count(
+          crossAxisCount: 3,
+          padding: const EdgeInsets.all(8),
+          children: categories.map((category) {
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedCategory = category['name'];
+                });
+                Navigator.pop(context);
+              },
+              child: Card(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(category['icon'], size: 40, color: Colors.teal),
+                    const SizedBox(height: 8),
+                    Text(category['name']),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  void _saveEntry() {
+    final accountModel = Provider.of<AccountModel>(context, listen: false);
+    final account = accountModel.getAccountByName(selectedAccount);
+    final double enteredAmount = double.tryParse(amount) ?? 0;
+
+    if (selectedCategory == 'Category' || selectedAccount == 'Account') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please select a valid category and account.')),
+      );
+      return;
+    }
+
+    if (account != null && enteredAmount > 0) {
+      if (isIncome) {
+        account['balance'] += enteredAmount;
+        accountModel.addIncome(selectedCategory, enteredAmount);
+      } else {
+        account['balance'] -= enteredAmount;
+        accountModel.addExpense(selectedCategory, enteredAmount);
+
+        // Notify BudgetPage about the expense
+        if (widget.onExpenseAdded != null) {
+          widget.onExpenseAdded!(selectedCategory, enteredAmount);
+        }
+      }
+
+      accountModel.notifyListeners();
+      setState(() {
+        amount = '0';
+      });
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${isIncome ? "Income" : "Expense"} saved!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid entry. Please check again.')),
+      );
+    }
   }
 }

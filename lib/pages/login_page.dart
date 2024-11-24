@@ -39,7 +39,8 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Login', style: TextStyle(color:Colors.white),),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.blueAccent,
+         centerTitle: true,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -51,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
               const Icon(
                 Icons.person_outline,
                 size: 100,
-                color: Colors.deepPurple,
+                color: Colors.blueAccent,
               ),
               const SizedBox(height: 20),
 
@@ -60,10 +61,10 @@ class _LoginPageState extends State<LoginPage> {
                  controller: emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: const TextStyle(color: Colors.deepPurple),
+                  labelStyle: const TextStyle(color: Colors.blueAccent),
                   filled: true,
-                  fillColor: Colors.deepPurple[50],
-                  prefixIcon: const Icon(Icons.email, color: Colors.deepPurple),
+                  fillColor: Colors.blueAccent[50],
+                  prefixIcon: const Icon(Icons.email, color: Colors.blueAccent),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -77,10 +78,10 @@ class _LoginPageState extends State<LoginPage> {
                  controller: passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  labelStyle: const TextStyle(color: Colors.deepPurple),
+                  labelStyle: const TextStyle(color: Colors.blueAccent),
                   filled: true,
-                  fillColor: Colors.deepPurple[50],
-                  prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
+                  fillColor: Colors.blueAccent[50],
+                  prefixIcon: const Icon(Icons.lock, color: Colors.blueAccent),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -98,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                     vertical: 15.0,
                     horizontal: 100.0,
                   ),
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -114,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 child: const Text(
                   "Don't have an account? Sign Up",
-                  style: TextStyle(color: Colors.deepPurple),
+                  style: TextStyle(color: Colors.blueAccent),
                 ),
               ),
             ],
