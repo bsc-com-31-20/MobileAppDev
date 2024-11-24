@@ -173,6 +173,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     leading: const Icon(FontAwesomeIcons.chartLine),
                     title: const Text('Financial Overview'),
                     trailing: const Icon(Icons.arrow_forward_ios),
+                    
                     onTap: () {
                       Navigator.push(
                         context,
