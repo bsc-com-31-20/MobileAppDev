@@ -63,13 +63,11 @@ class CategoryModel with ChangeNotifier {
             .toList();
 
         _incomeCategories.forEach((category) {
-          category['icon'] = iconMapping[category['iconId']] ??
-              Icons.help; // Use iconMapping or fallback to Icons.help
+          category['icon'] = iconMapping[category['iconId']] ?? Icons.help;
         });
 
         _expenseCategories.forEach((category) {
-          category['icon'] = iconMapping[category['iconId']] ??
-              Icons.help; // Use iconMapping or fallback to Icons.help
+          category['icon'] = iconMapping[category['iconId']] ?? Icons.help;
         });
 
         notifyListeners();
@@ -93,7 +91,7 @@ class CategoryModel with ChangeNotifier {
         'iconId': iconMapping.entries
             .firstWhere((entry) => entry.value == icon,
                 orElse: () => MapEntry(0, Icons.help))
-            .key, // Store the iconId
+            .key,
         'is_income': isIncomeCategory,
         'ignored': false,
         'user_id': userId,
