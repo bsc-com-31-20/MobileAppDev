@@ -35,12 +35,12 @@ class _CategoryPageState extends State<CategoryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildCategorySection(
-                'Income Categories',
+                'Income Categories:',
                 categoryModel.incomeCategories,
                 'You don\'t have any income category yet. Please add a new income category.',
               ),
               _buildCategorySection(
-                'Expense Categories',
+                'Expense Categories:',
                 categoryModel.expenseCategories,
                 'You don\'t have any expense category yet. Please add a new expense category.',
               ),
@@ -96,7 +96,6 @@ class _CategoryPageState extends State<CategoryPage> {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              decoration: TextDecoration.underline,
             ),
           ),
         ),

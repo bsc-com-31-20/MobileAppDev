@@ -155,26 +155,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                     // Income (Static value or replace with dynamic if needed)
-                    const Column(
-                      children: [
-                        Text(
-                          'MK280,000',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          'Monthly Income',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -209,15 +189,6 @@ class _ProfilePageState extends State<ProfilePage> {
                               builder: (context) => const AccountsPage()),
                         );
                       }),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(FontAwesomeIcons.piggyBank),
-                    title: const Text('Savings Goals'),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () {
-                      // Navigate to savings goals
-                    },
-                  ),
                   const Divider(),
                   ListTile(
                     leading: const Icon(FontAwesomeIcons.cogs),

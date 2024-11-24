@@ -40,6 +40,7 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: const Text('Login', style: TextStyle(color:Colors.white),),
         backgroundColor: Colors.blueAccent,
+         centerTitle: true,
         elevation: 0,
       ),
       body: SingleChildScrollView(
