@@ -121,7 +121,8 @@ class _CategoryPageState extends State<CategoryPage> {
       child: Card(
         margin: const EdgeInsets.only(bottom: 10.0),
         child: ListTile(
-          leading: Icon(category['icon'], size: 40),
+          leading: Icon(category['icon'] ?? Icons.category,
+              size: 40), // Default icon
           title: Text(
             category['name'],
             style: TextStyle(
@@ -274,8 +275,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       text:
           widget.initialCategory != null ? widget.initialCategory!['name'] : '',
     );
-    _selectedIconIndex = _iconOptions
-        .indexOf(widget.initialCategory?['icon'] ?? Icons.card_giftcard);
+    _selectedIconIndex = _iconOptions.indexOf(
+        widget.initialCategory?['icon'] ?? Icons.card_giftcard); // Default icon
   }
 
   @override
@@ -331,41 +332,46 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Category Name',
-                border: OutlineInputBorder(),
-              ),
+              decoration: const InputDecoration(labelText: 'Category Name'),
             ),
-            const SizedBox(height: 20),
-            const Text('Choose an Icon',
-                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 10,
-              children: List.generate(_iconOptions.length, (index) {
+            const Text('Select Icon:'),
+            GridView.builder(
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+              ),
+              itemCount: _iconOptions.length,
+              itemBuilder: (context, index) {
                 return GestureDetector(
-                  onTap: () => setState(() => _selectedIconIndex = index),
+                  onTap: () {
+                    setState(() {
+                      _selectedIconIndex = index;
+                    });
+                  },
                   child: Icon(
                     _iconOptions[index],
-                    size: 40,
                     color:
                         _selectedIconIndex == index ? Colors.blue : Colors.grey,
+                    size: 30,
                   ),
                 );
-              }),
+              },
             ),
           ],
         ),
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pop(context);
+          },
           child: const Text('CANCEL'),
         ),
-        ElevatedButton(
+        TextButton(
           onPressed: () {
             widget.onSave(
               _nameController.text,
